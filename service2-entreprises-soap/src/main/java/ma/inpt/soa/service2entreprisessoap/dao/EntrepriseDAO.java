@@ -6,56 +6,64 @@ import java.sql.*;
 public class EntrepriseDAO {
 
     public boolean ajouterEntreprise(Entreprise e) {
-        String sql = "INSERT INTO entreprises (nom, secteur, adresse, email, telephone, responsable_contact, est_active) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO entreprises (raison_sociale, secteur, ville, contact_nom, contact_email, telephone, conventionnee) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, e.getNom());
+            
+            ps.setString(1, e.getRaisonSociale());
             ps.setString(2, e.getSecteur());
-            ps.setString(3, e.getAdresse());
-            ps.setString(4, e.getEmail());
-            ps.setString(5, e.getTelephone());
-            ps.setString(6, e.getResponsableContact());
-            ps.setBoolean(7, e.isEstActive());
+            ps.setString(3, e.getVille());
+            ps.setString(4, e.getContactNom());
+            ps.setString(5, e.getContactEmail());
+            ps.setString(6, e.getTelephone());
+            ps.setBoolean(7, e.isConventionnee());
+            
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.err.println("ERREUR SQL (Ajout) : " + ex.getMessage());
             return false;
         }
     }
 
-    public Entreprise consulterEntreprise(int id) {
-        String sql = "SELECT * FROM entreprises WHERE id = ?";
+    public Entreprise consulterEntreprise(String email) {
+        String sql = "SELECT * FROM entreprises WHERE contact_email = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            
+            ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
+            
             if (rs.next()) {
                 Entreprise e = new Entreprise();
                 e.setId(rs.getInt("id"));
-                e.setNom(rs.getString("nom"));
+                e.setRaisonSociale(rs.getString("raison_sociale"));
                 e.setSecteur(rs.getString("secteur"));
-                e.setAdresse(rs.getString("adresse"));
-                e.setEmail(rs.getString("email"));
+                e.setVille(rs.getString("ville"));
+                e.setContactNom(rs.getString("contact_nom"));
+                e.setContactEmail(rs.getString("contact_email"));
                 e.setTelephone(rs.getString("telephone"));
-                e.setResponsableContact(rs.getString("responsable_contact"));
-                e.setEstActive(rs.getBoolean("est_active"));
+                e.setConventionnee(rs.getBoolean("conventionnee"));
                 return e;
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.err.println("ERREUR SQL (Consultation) : " + ex.getMessage());
         }
         return null;
     }
 
     public boolean verifierEntrepriseReferencee(int id) {
-        String sql = "SELECT COUNT(*) FROM entreprises WHERE id = ? AND est_active = true";
+        String sql = "SELECT conventionnee FROM entreprises WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+            
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1) > 0;
+            
+            if (rs.next()) {
+                return rs.getBoolean("conventionnee");
+            }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.err.println("ERREUR SQL (Vérification) : " + ex.getMessage());
         }
         return false;
     }

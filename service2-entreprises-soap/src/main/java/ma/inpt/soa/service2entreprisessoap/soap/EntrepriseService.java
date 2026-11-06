@@ -5,9 +5,15 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService(name = "EntrepriseService", targetNamespace = "http://soap.soa.inpt.ma/")
+@WebService(targetNamespace = "http://soap.soa.inpt.ma/", serviceName = "EntrepriseService")
 public interface EntrepriseService {
-    @WebMethod boolean ajouterEntreprise(@WebParam(name = "entreprise") Entreprise entreprise);
-    @WebMethod Entreprise consulterEntreprise(@WebParam(name = "id") int id);
-    @WebMethod boolean verifierEntrepriseReferencee(@WebParam(name = "id") int id);
+
+    @WebMethod(operationName = "ajouterEntreprise")
+    boolean ajouterEntreprise(@WebParam(name = "entreprise") Entreprise entreprise);
+
+    @WebMethod(operationName = "consulterEntrepriseParEmail")
+    Entreprise consulterEntrepriseParEmail(@WebParam(name = "email") String email);
+
+    @WebMethod(operationName = "verifierEntrepriseReferencee")
+    boolean verifierEntrepriseReferencee(@WebParam(name = "id") int id);
 }
