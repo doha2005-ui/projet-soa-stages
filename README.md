@@ -19,6 +19,8 @@ Plateforme de gestion des offres de stage, candidatures et suivi des stages (3 s
 
 ## Organisation du Front-end par Service
 
+> 📄 **Guide complet de répartition de l'équipe :** Consultez [`docs/repartition-frontend.md`](docs/repartition-frontend.md) pour le détail exhaustif des responsabilités, la matrice des fichiers modifiables par membre et le guide d'utilisation des outils `shared/`.
+
 Pour éviter les problèmes d'intégration de dernière minute, **le front-end est divisé par service et non par type d'utilisateur**. Chaque membre conçoit et teste directement les écrans de ses propres services dès le début du projet.
 
 ### Nouvelle répartition par membre
