@@ -1,0 +1,62 @@
+[
+  {
+    "id": 501,
+    "etudiantNom": "Benali Yassine",
+    "etudiantCne": "G138094521",
+    "entrepriseNom": "TechSolutions Maroc",
+    "intitule": "Plateforme Microservices & CI/CD",
+    "dateDebut": "2026-02-01",
+    "dateFin": "2026-06-30",
+    "tuteurEntreprise": "Karim Tazi",
+    "tuteurAcademique": "Pr. Alami",
+    "etat": "EN_COURS",
+    "comptesRendus": [
+      {
+        "id": 1,
+        "periode": "Février 2026 (Semaine 1-4)",
+        "dateDepot": "2026-02-28",
+        "resume": "Prise en main de l'environnement, architecture Spring Boot et Docker.",
+        "statutValidation": "VALIDÉ"
+      },
+      {
+        "id": 2,
+        "periode": "Mars 2026 (Semaine 5-8)",
+        "dateDepot": "2026-03-31",
+        "resume": "Implémentation des APIs REST et tests unitaires.",
+        "statutValidation": "EN_ATTENTE"
+      }
+    ],
+    "evaluations": {
+      "noteEntreprise": 17.5,
+      "noteAcademique": 16.0,
+      "commentaireTuteur": "Très bon travail en équipe et rigueur technique démontrée."
+    }
+  },
+  {
+    "id": 502,
+    "etudiantNom": "El Idrissi Fatima",
+    "etudiantCne": "G134088912",
+    "entrepriseNom": "Fintech Horizons",
+    "intitule": "Sécurisation de passerelles de paiement bancaire",
+    "dateDebut": "2026-02-15",
+    "dateFin": "2026-07-15",
+    "tuteurEntreprise": "Nezha Berrada",
+    "tuteurAcademique": "Pr. Bennani",
+    "etat": "EN_COURS",
+    "comptesRendus": [
+      {
+        "id": 1,
+        "periode": "Février-Mars 2026",
+        "dateDepot": "2026-03-25",
+        "resume": "Audit de conformité PCI-DSS et identification des failles potentielles.",
+        "statutValidation": "VALIDÉ"
+      }
+    ],
+    "evaluations": {
+      "noteEntreprise": null,
+      "noteAcademique": null,
+      "commentaireTuteur": "Stage en bonne voie, rapport d'audit préliminaire très satisfaisant."
+    }
+  }
+]
+

@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "raisonSociale": "TechSolutions Maroc",
+    "secteur": "Développement Logiciel & Cloud",
+    "ville": "Casablanca, Technopark",
+    "contactNom": "M. Karim Tazi",
+    "contactEmail": "recrutement@techsolutions.ma",
+    "telephone": "+212 5 22 10 20 30",
+    "conventionnee": true,
+    "offresActives": 3
+  },
+  {
+    "id": 2,
+    "raisonSociale": "Fintech Horizons",
+    "secteur": "Banque & Finance Numérique",
+    "ville": "Casablanca Finance City (CFC)",
+    "contactNom": "Mme. Nezha Berrada",
+    "contactEmail": "rh@fintechhorizons.com",
+    "telephone": "+212 5 22 99 88 77",
+    "conventionnee": true,
+    "offresActives": 2
+  },
+  {
+    "id": 3,
+    "raisonSociale": "CyberShield Africa",
+    "secteur": "Cybersécurité & Audit SOC",
+    "ville": "Rabat, Madinat Al Irfane",
+    "contactNom": "M. Omar Filali",
+    "contactEmail": "hr@cybershield.ma",
+    "telephone": "+212 5 37 77 66 55",
+    "conventionnee": false,
+    "offresActives": 1
+  }
+]
+

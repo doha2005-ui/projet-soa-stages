@@ -1,0 +1,41 @@
+{
+  "processDefinition": {
+    "name": "Processus_Gestion_Stages_INPT",
+    "version": "1.0",
+    "engine": "Bonita BPM 7.x / 2023",
+    "description": "Orchestration complète du cycle de vie des stages et candidatures"
+  },
+  "instances": [
+    {
+      "caseId": 1001,
+      "candidat": "Benali Yassine",
+      "offre": "Stage PFE - Architectures Microservices",
+      "etapeCourante": "Suivi du Stage & Évaluations",
+      "dateLancement": "2026-11-02",
+      "statut": "EN_COURS",
+      "etapes": [
+        { "nom": "Dépôt Candidature", "responsable": "Étudiant", "statut": "TERMINÉ" },
+        { "nom": "Sélection RH", "responsable": "Entreprise (TechSolutions)", "statut": "TERMINÉ" },
+        { "nom": "Validation Pédagogique", "responsable": "Responsable Stages", "statut": "TERMINÉ" },
+        { "nom": "Signature Convention", "responsable": "Service Scolarité", "statut": "TERMINÉ" },
+        { "nom": "Suivi du Stage & Évaluations", "responsable": "Tuteurs", "statut": "EN_COURS" }
+      ]
+    },
+    {
+      "caseId": 1002,
+      "candidat": "El Idrissi Fatima",
+      "offre": "Stage PFE - Audit de Sécurité",
+      "etapeCourante": "Sélection RH",
+      "dateLancement": "2026-11-04",
+      "statut": "EN_ATTENTE_TACHE",
+      "etapes": [
+        { "nom": "Dépôt Candidature", "responsable": "Étudiant", "statut": "TERMINÉ" },
+        { "nom": "Sélection RH", "responsable": "Entreprise (CyberShield)", "statut": "EN_COURS" },
+        { "nom": "Validation Pédagogique", "responsable": "Responsable Stages", "statut": "NON_DEMARRÉ" },
+        { "nom": "Signature Convention", "responsable": "Service Scolarité", "statut": "NON_DEMARRÉ" },
+        { "nom": "Suivi du Stage & Évaluations", "responsable": "Tuteurs", "statut": "NON_DEMARRÉ" }
+      ]
+    }
+  ]
+}
+

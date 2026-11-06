@@ -1,0 +1,43 @@
+[
+  {
+    "id": 101,
+    "destinataireId": 1,
+    "destinataireType": "ETUDIANT",
+    "titre": "Candidature acceptée",
+    "message": "Félicitations ! Votre candidature pour le stage 'Développeur Full-Stack Java/React' chez TechSolutions Maroc a été acceptée.",
+    "dateEnvoi": "2026-11-05T14:32:00",
+    "statut": "LUE",
+    "serviceEmetteur": "service4-candidatures-rest"
+  },
+  {
+    "id": 102,
+    "destinataireId": 1,
+    "destinataireType": "ETUDIANT",
+    "titre": "Dépôt compte rendu mi-parcours",
+    "message": "Rappel : la date limite pour déposer votre compte rendu de stage n°1 est le 20 novembre 2026.",
+    "dateEnvoi": "2026-11-06T09:15:00",
+    "statut": "NON_LUE",
+    "serviceEmetteur": "service6-suivi-stages-rest"
+  },
+  {
+    "id": 103,
+    "destinataireId": 2,
+    "destinataireType": "ENTREPRISE",
+    "titre": "Nouvelle candidature reçue",
+    "message": "L'étudiante Fatima El Idrissi a postulé à votre offre 'Ingénieur Sécurité Cloud'.",
+    "dateEnvoi": "2026-11-06T11:45:00",
+    "statut": "NON_LUE",
+    "serviceEmetteur": "service4-candidatures-rest"
+  },
+  {
+    "id": 104,
+    "destinataireId": 0,
+    "destinataireType": "RESPONSABLE",
+    "titre": "Convention de stage à valider",
+    "message": "La convention pour Yassine Benali nécessite votre signature académique avant transmission.",
+    "dateEnvoi": "2026-11-06T15:20:00",
+    "statut": "NON_LUE",
+    "serviceEmetteur": "bonita-bpmn"
+  }
+]
+
