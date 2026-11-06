@@ -32,9 +32,9 @@
 
     <!-- Pilote de base de données (remplacer par PostgreSQL si besoin) -->
     <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>${mysql.version}</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.5.4</version>
     </dependency>
   </dependencies>
 
