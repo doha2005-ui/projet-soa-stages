@@ -156,7 +156,7 @@ function afficherStages(liste) {
         </h4>
         <div class="grid grid-2">
           ${(stage.comptesRendus && stage.comptesRendus.length > 0)
-            ? stage.comptesRendus.map(cr => `
+      ? stage.comptesRendus.map(cr => `
               <div style="background: var(--surface-alt); border-radius: var(--radius-sm); padding: 0.75rem; border: 1px solid var(--border); font-size: 0.85rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
                   <strong>${cr.periode}</strong>
@@ -168,7 +168,7 @@ function afficherStages(liste) {
                 <div style="font-size: 0.7rem; color: var(--text-light);">Déposé le ${cr.dateDepot}</div>
               </div>
             `).join('')
-            : '<div style="font-size: 0.8rem; color: var(--text-muted);">Aucun compte rendu soumis pour le moment.</div>'}
+      : '<div style="font-size: 0.8rem; color: var(--text-muted);">Aucun compte rendu soumis pour le moment.</div>'}
         </div>
       </div>
 
@@ -178,14 +178,13 @@ function afficherStages(liste) {
           <div>
             <strong>Évaluation globale :</strong>
             <span style="color: var(--success); font-weight: 700; margin-left: 0.5rem;">
-              ${stage.evaluations?.noteEntreprise ? `${stage.evaluations.noteEntreprise}/20 (Entreprise)` : 'Non noté'}
+              ${stage.evaluation?.noteEntreprise ? `${stage.evaluation.noteEntreprise}/20 (Entreprise)` : 'Non noté'}
             </span>
-            ${stage.evaluations?.noteAcademique ? ` | <span style="font-weight: 700; color: var(--primary);">${stage.evaluations.noteAcademique}/20 (Académique)</span>` : ''}
+            ${stage.evaluation?.noteAcademique ? ` | <span style="font-weight: 700; color: var(--primary);">${stage.evaluation.noteAcademique}/20 (Académique)</span>` : ''}
           </div>
         </div>
-        ${stage.evaluations?.commentaireTuteur ? `<p style="font-style: italic; color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem;">« ${stage.evaluations.commentaireTuteur} »</p>` : ''}
+        ${stage.evaluation?.commentaireTuteur ? `<p style="font-style: italic; color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem;">« ${stage.evaluation.commentaireTuteur} »</p>` : ''}
       </div>
-    </div>
   `).join('');
 }
 
@@ -193,21 +192,20 @@ function fermerModal(modalId) {
   document.getElementById(modalId).style.display = 'none';
 }
 
-window.ouvrirDepotCR = function(stageId) {
+window.ouvrirDepotCR = function (stageId) {
   document.getElementById('cr-stage-id').value = stageId;
   document.getElementById('cr-form').reset();
   document.getElementById('cr-modal').style.display = 'flex';
 };
 
-window.ouvrirEval = function(stageId) {
+window.ouvrirEval = function (stageId) {
   const stage = stagesCache.find(s => s.id == stageId);
   document.getElementById('eval-stage-id').value = stageId;
-  document.getElementById('eval-note-ent').value = stage?.evaluations?.noteEntreprise || '';
-  document.getElementById('eval-note-acad').value = stage?.evaluations?.noteAcademique || '';
-  document.getElementById('eval-comm').value = stage?.evaluations?.commentaireTuteur || '';
+  document.getElementById('eval-note-ent').value = stage?.evaluation?.noteEntreprise || '';
+  document.getElementById('eval-note-acad').value = stage?.evaluation?.noteAcademique || '';
+  document.getElementById('eval-comm').value = stage?.evaluation?.commentaireTuteur || '';
   document.getElementById('eval-modal').style.display = 'flex';
 };
-
 async function soumettreCompteRendu() {
   const stageId = document.getElementById('cr-stage-id').value;
   const nouveauCR = {
@@ -256,7 +254,7 @@ async function enregistrerEvaluation() {
       { method: 'PUT', body: JSON.stringify(evalData) },
       () => {
         const stage = stagesCache.find(s => s.id == stageId);
-        if (stage) stage.evaluations = evalData;
+        if (stage) stage.evaluation = evalData; // <-- ICI : enlève le "s"
         return evalData;
       }
     );
