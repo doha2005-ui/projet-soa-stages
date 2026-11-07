@@ -1,0 +1,42 @@
+[
+  {
+    "id": 301,
+    "offreId": 201,
+    "offreTitre": "Stage PFE - Architectures Microservices & DevOps",
+    "entrepriseNom": "TechSolutions Maroc",
+    "etudiantId": 1,
+    "etudiantNom": "Benali Yassine",
+    "etudiantEmail": "yassine.benali@inpt.ac.ma",
+    "dateDepot": "2026-11-02",
+    "statut": "acceptée",
+    "motivation": "Passionné d'architectures distribuées et des technologies Docker/K8s.",
+    "orchestrateur": "REST (Service 4 direct)"
+  },
+  {
+    "id": 302,
+    "offreId": 202,
+    "offreTitre": "Stage PFE - Audit de Sécurité & DevSecOps",
+    "entrepriseNom": "CyberShield Africa",
+    "etudiantId": 2,
+    "etudiantNom": "El Idrissi Fatima",
+    "etudiantEmail": "fatima.elidrissi@inpt.ac.ma",
+    "dateDepot": "2026-11-04",
+    "statut": "en cours d'évaluation",
+    "motivation": "Expérience préalable en pentest web et projet académique SOC.",
+    "orchestrateur": "BPMN (Bonita Process)"
+  },
+  {
+    "id": 303,
+    "offreId": 203,
+    "offreTitre": "Stage d'Application - Développement Frontend Angular/React",
+    "entrepriseNom": "Fintech Horizons",
+    "etudiantId": 3,
+    "etudiantNom": "Amrani Mehdi",
+    "etudiantEmail": "mehdi.amrani@inpt.ac.ma",
+    "dateDepot": "2026-11-05",
+    "statut": "déposée",
+    "motivation": "Très motivé pour contribuer à vos interfaces web fintech.",
+    "orchestrateur": "BPMN (Bonita Process)"
+  }
+]
+

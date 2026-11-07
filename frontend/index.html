@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projet SOA - Gestion Intelligente des Stages</title>
+  <link rel="stylesheet" href="shared/theme.css">
+</head>
+<body>
+
+  <!-- En-tête Global -->
+  <header class="app-header">
+    <a href="#accueil" class="brand">
+      <div class="brand-icon">SOA</div>
+      <div class="brand-text">
+        <h1>Gestion Intelligente des Stages</h1>
+        <p>Projet SOA 2026-2027 • Architecture Distribuée</p>
+      </div>
+    </a>
+
+    <div class="header-controls">
+      <!-- Sélecteur d'espace / rôle utilisateur -->
+      <div class="role-selector" title="Filtrer les menus selon le profil utilisateur">
+        <button class="role-btn active" data-role="all">Tous les services</button>
+        <button class="role-btn" data-role="etudiant">Espace Étudiant</button>
+        <button class="role-btn" data-role="entreprise">Espace Entreprise</button>
+        <button class="role-btn" data-role="responsable">Espace Responsable</button>
+      </div>
+
+      <!-- Interrupteur de données simulées (Mock) -->
+      <div class="mock-switch-container" title="Basculez entre les données JSON simulées et les services réels Tomcat">
+        <span id="mock-label">Données simulées</span>
+        <label class="switch">
+          <input type="checkbox" id="mock-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <!-- Structure Principale -->
+  <div class="app-container">
+    <!-- Barre latérale de navigation -->
+    <aside class="app-sidebar">
+      <div class="nav-section-title">Navigation par Service</div>
+      <ul class="nav-list" id="sidebar-nav">
+        <!-- Rempli dynamiquement par layout.js selon le rôle sélectionné -->
+      </ul>
+
+      <div class="nav-section-title" style="margin-top: 1.5rem;">Légende Protocoles</div>
+      <div style="display: flex; flex-direction: column; gap: 0.35rem; padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="badge-type badge-soap">SOAP</span>
+          <span style="color: var(--text-muted);">Services 1, 2, 3 (JAX-WS)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="badge-type badge-rest">REST</span>
+          <span style="color: var(--text-muted);">Services 4, 5, 6 (Jersey)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="badge-type badge-bpmn">BPMN</span>
+          <span style="color: var(--text-muted);">Orchestration Bonita</span>
+        </div>
+      </div>
+
+      <!-- Pied de la barre latérale -->
+      <div class="sidebar-footer">
+        <div style="font-weight: 600; margin-bottom: 0.25rem;">Équipe SOA 2026-2027</div>
+        <div>M1 : Étudiants / Notifs</div>
+        <div>M2 : Entreprises / Stages</div>
+        <div>M3 : Offres / Candidatures</div>
+        <div>M4 : Squelette & BPMN</div>
+      </div>
+    </aside>
+
+    <!-- Zone de contenu de la page active -->
+    <main class="app-content" id="app-main">
+      <!-- Le module JS de la page sélectionnée s'injecte ici -->
+    </main>
+  </div>
+
+  <!-- Script d'initialisation du squelette commun (Membre 4) -->
+  <script type="module">
+    import { initLayout } from './shared/layout.js';
+    initLayout();
+  </script>
+</body>
+</html>
+

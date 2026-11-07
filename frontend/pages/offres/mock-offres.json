@@ -1,0 +1,45 @@
+[
+  {
+    "id": 201,
+    "titre": "Stage PFE - Architectures Microservices & DevOps",
+    "entrepriseId": 1,
+    "entrepriseNom": "TechSolutions Maroc",
+    "lieu": "Casablanca, Technopark",
+    "type": "PFE (Projet de Fin d'Études)",
+    "duree": "6 mois",
+    "remuneration": "5000 DH / mois",
+    "competences": "Java, Spring Boot, Docker, Kubernetes, CI/CD",
+    "description": "Conception et déploiement d'une architecture orientée services résiliente avec passerelle API et observabilité.",
+    "datePublication": "2026-10-15",
+    "active": true
+  },
+  {
+    "id": 202,
+    "titre": "Stage PFE - Audit de Sécurité & DevSecOps",
+    "entrepriseId": 3,
+    "entrepriseNom": "CyberShield Africa",
+    "lieu": "Rabat",
+    "type": "PFE (Projet de Fin d'Études)",
+    "duree": "6 mois",
+    "remuneration": "4500 DH / mois",
+    "competences": "SIEM, OWASP, Python, SonarQube, Sécurité Cloud",
+    "description": "Mise en place de pipelines DevSecOps et tests d'intrusion automatisés sur infrastructures virtualisées.",
+    "datePublication": "2026-10-20",
+    "active": true
+  },
+  {
+    "id": 203,
+    "titre": "Stage d'Application - Développement Frontend Angular/React",
+    "entrepriseId": 2,
+    "entrepriseNom": "Fintech Horizons",
+    "lieu": "Casablanca Finance City",
+    "type": "Stage Technique (2ème année)",
+    "duree": "3 mois",
+    "remuneration": "3500 DH / mois",
+    "competences": "TypeScript, Angular ou React, REST APIs, TailwindCSS",
+    "description": "Modernisation du portail client et intégration des dashboards bancaires temps réel.",
+    "datePublication": "2026-11-01",
+    "active": true
+  }
+]
+

@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "cne": "G138094521",
+    "nom": "Benali",
+    "prenom": "Yassine",
+    "email": "yassine.benali@inpt.ac.ma",
+    "telephone": "+212 6 12 34 56 78",
+    "filiere": "Ingénierie des Données et Logiciel (IDL)",
+    "annee": "3ème année (PFE)",
+    "cvUrl": "cv_benali.pdf"
+  },
+  {
+    "id": 2,
+    "cne": "G134088912",
+    "nom": "El Idrissi",
+    "prenom": "Fatima",
+    "email": "fatima.elidrissi@inpt.ac.ma",
+    "telephone": "+212 6 78 90 12 34",
+    "filiere": "Cyber Sécurité et Confiance Numérique (CSCN)",
+    "annee": "3ème année (PFE)",
+    "cvUrl": "cv_elidrissi.pdf"
+  },
+  {
+    "id": 3,
+    "cne": "G131102948",
+    "nom": "Amrani",
+    "prenom": "Mehdi",
+    "email": "mehdi.amrani@inpt.ac.ma",
+    "telephone": "+212 6 55 44 33 22",
+    "filiere": "Systèmes Embarqués et IoT (SEIoT)",
+    "annee": "2ème année",
+    "cvUrl": "cv_amrani.pdf"
+  },
+  {
+    "id": 4,
+    "cne": "G139981240",
+    "nom": "Chraibi",
+    "prenom": "Salma",
+    "email": "salma.chraibi@inpt.ac.ma",
+    "telephone": "+212 6 61 22 33 44",
+    "filiere": "Cloud et Réseaux Télécoms (CRT)",
+    "annee": "3ème année (PFE)",
+    "cvUrl": "cv_chraibi.pdf"
+  }
+]
+
