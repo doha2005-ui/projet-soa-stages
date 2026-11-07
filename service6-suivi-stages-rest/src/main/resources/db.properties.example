@@ -1,5 +1,0 @@
-# Copier ce fichier en db.properties et renseigner ses identifiants.
-# db.properties est ignoré par Git : ne jamais le commiter.
-db.url=jdbc:mysql://localhost:3306/soa_stages?useSSL=false&serverTimezone=UTC
-db.user=CHANGER_MOI
-db.password=CHANGER_MOI
