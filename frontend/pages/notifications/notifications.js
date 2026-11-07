@@ -1,9 +1,3 @@
-/**
- * frontend/pages/notifications/notifications.js
- * Membre 1 : Service 5 Notifications (REST Jersey)
- * Pages : notifications (historique, filtres, envoi test)
- */
-
 import { CONFIG } from '../../shared/config.js';
 import { restCall, showToast } from '../../shared/api.js';
 
@@ -26,7 +20,6 @@ export async function render(container) {
       </div>
     </div>
 
-    <!-- Filtres -->
     <div class="card" style="margin-bottom: 1.5rem; padding: 1rem;">
       <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
         <label class="form-label" style="margin: 0;">Filtrer par rôle :</label>
@@ -40,12 +33,10 @@ export async function render(container) {
       </div>
     </div>
 
-    <!-- Liste des notifications -->
     <div class="grid" id="notifications-list" style="gap: 1rem;">
       <div style="text-align: center; color: var(--text-muted); padding: 2rem;">Chargement des notifications...</div>
     </div>
 
-    <!-- Modal d'envoi de notification -->
     <div id="notif-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
@@ -80,7 +71,6 @@ export async function render(container) {
 
   await chargerNotifications();
 
-  // Événements
   document.getElementById('notif-role-filter').addEventListener('change', (e) => {
     filtrerNotifications(e.target.value);
   });
@@ -200,12 +190,26 @@ async function envoyerNotification() {
   }
 }
 
-window.marquerLu = function(id) {
+window.marquerLu = async function(id) {
   const notif = notificationsCache.find(n => n.id == id);
-  if (notif) {
+  if (!notif) return;
+
+  try {
+    const serviceInfo = CONFIG.services.notifications;
+    
+    await restCall(
+      `${serviceInfo.endpoint}/${id}/statut?statut=LUE`,
+      { method: 'PUT' },
+      () => {
+        notif.statut = 'LUE';
+        return notif;
+      }
+    );
+
     notif.statut = 'LUE';
     afficherNotifications(notificationsCache);
-    showToast('Notification marquée comme lue', 'info');
+    showToast('Notification marquée comme lue', 'success');
+  } catch (err) {
+    showToast(`Erreur mise à jour : ${err.message}`, 'error');
   }
 };
-

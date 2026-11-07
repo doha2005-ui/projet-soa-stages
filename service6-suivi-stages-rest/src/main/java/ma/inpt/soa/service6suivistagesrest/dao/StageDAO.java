@@ -65,7 +65,7 @@ public class StageDAO {
 
     public List<Stage> listerStages() {
         List<Stage> liste = new ArrayList<>();
-        // CORRECTION : CONCAT fusionne nom et prénom dans une seule colonne 'etudiant_nom'
+        
         String sql = "SELECT s.id, s.etudiant_id, s.entreprise_id, s.intitule, " +
                 "s.date_debut, s.date_fin, s.tuteur_entreprise, " +
                 "s.tuteur_academique, s.etat, " +
