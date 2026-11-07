@@ -250,7 +250,7 @@ async function sauvegarderEntreprise() {
       </entreprise>
     `;
 
-    await soapCall({
+    const res = await soapCall({
       url: serviceInfo.endpoint,
       operation: id ? 'modifierEntreprise' : 'ajouterEntreprise',
       bodyXml,
@@ -266,10 +266,28 @@ async function sauvegarderEntreprise() {
       }
     });
 
+    // En mode réel SOAP, vérifier si l'opération a réussi
+    if (res?.xmlDoc) {
+      const returnText = getXmlNodeText(res.xmlDoc, 'return');
+      if (returnText === 'false') {
+        throw new Error("La base de données a rejeté l'enregistrement (vérifiez que MySQL/Postgres est démarré et que db.properties est configuré).");
+      }
+    }
+
+    // Si on est en mode Mock ou si c'est un succès réel
+    if (CONFIG.useMock) {
+      if (!id) entreprisesCache.unshift(entData);
+    }
+
     showToast('Entreprise enregistrée avec succès !', 'success');
     fermerModal();
-    afficherCartes(entreprisesCache);
-    mettreAJourStats(entreprisesCache);
+
+    if (!CONFIG.useMock) {
+      await chargerEntreprises();
+    } else {
+      afficherCartes(entreprisesCache);
+      mettreAJourStats(entreprisesCache);
+    }
   } catch (err) {
     showToast(`Erreur enregistrement : ${err.message}`, 'error');
   }

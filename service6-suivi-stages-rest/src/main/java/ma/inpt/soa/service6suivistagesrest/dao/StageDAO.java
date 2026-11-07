@@ -55,6 +55,8 @@ public class StageDAO {
                 s.setTuteurEntreprise(rs.getString("tuteur_entreprise"));
                 s.setTuteurAcademique(rs.getString("tuteur_academique"));
                 s.setEtat(rs.getString("etat"));
+                s.setComptesRendus(listerComptesRendus(s.getId()));
+                s.setEvaluation(getEvaluation(s.getId()));
                 return s;
             }
         } catch (SQLException ex) {
@@ -157,6 +159,41 @@ public class StageDAO {
             System.err.println("ERREUR SQL (Evaluation) : " + ex.getMessage());
         }
         return null;
+    }
+
+    public boolean enregistrerEvaluation(int stageId, Evaluation eval) {
+        String sql = "INSERT INTO evaluations (stage_id, note_entreprise, note_academique, commentaire_tuteur) " +
+                     "VALUES (?, ?, ?, ?) " +
+                     "ON DUPLICATE KEY UPDATE note_entreprise = VALUES(note_entreprise), " +
+                     "note_academique = VALUES(note_academique), " +
+                     "commentaire_tuteur = VALUES(commentaire_tuteur)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stageId);
+            ps.setBigDecimal(2, eval.getNoteEntreprise());
+            ps.setBigDecimal(3, eval.getNoteAcademique());
+            ps.setString(4, eval.getCommentaireTuteur());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            System.err.println("ERREUR SQL (Enregistrement Évaluation) : " + ex.getMessage());
+            return false;
+        }
+    }
+
+    public boolean ajouterCompteRendu(int stageId, CompteRendu cr) {
+        String sql = "INSERT INTO comptes_rendus (stage_id, periode, date_depot, resume, statut_validation) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, stageId);
+            ps.setString(2, cr.getPeriode());
+            ps.setDate(3, cr.getDateDepot() != null ? new java.sql.Date(cr.getDateDepot().getTime()) : new java.sql.Date(System.currentTimeMillis()));
+            ps.setString(4, cr.getResume());
+            ps.setString(5, cr.getStatutValidation() != null ? cr.getStatutValidation() : "EN_ATTENTE");
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            System.err.println("ERREUR SQL (Ajout Compte Rendu) : " + ex.getMessage());
+            return false;
+        }
     }
 
     public boolean mettreAJourStatut(int id, String nouveauStatut) {

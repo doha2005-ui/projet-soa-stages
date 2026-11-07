@@ -1,6 +1,8 @@
 package ma.inpt.soa.service6suivistagesrest.rest;
 
 import ma.inpt.soa.service6suivistagesrest.dao.StageDAO;
+import ma.inpt.soa.service6suivistagesrest.entity.CompteRendu;
+import ma.inpt.soa.service6suivistagesrest.entity.Evaluation;
 import ma.inpt.soa.service6suivistagesrest.entity.Stage;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -42,6 +44,32 @@ public class StageResource {
     public Response listerStages() {
         List<Stage> stages = dao.listerStages();
         return Response.ok(stages).build();
+    }
+
+    @PUT
+    @Path("/{id}/evaluation")
+    public Response enregistrerEvaluation(@PathParam("id") int id, Evaluation evaluation) {
+        System.out.println("Enregistrement de l'évaluation pour le stage " + id);
+        if (dao.enregistrerEvaluation(id, evaluation)) {
+            return Response.ok("{\"message\": \"Évaluation enregistrée avec succès\"}").build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"error\": \"Impossible d'enregistrer l'évaluation\"}")
+                .build();
+    }
+
+    @POST
+    @Path("/{id}/comptes-rendus")
+    public Response ajouterCompteRendu(@PathParam("id") int id, CompteRendu compteRendu) {
+        System.out.println("Ajout d'un compte rendu pour le stage " + id);
+        if (dao.ajouterCompteRendu(id, compteRendu)) {
+            return Response.status(Response.Status.CREATED)
+                    .entity("{\"message\": \"Compte rendu ajouté avec succès\"}")
+                    .build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"error\": \"Impossible d'ajouter le compte rendu\"}")
+                .build();
     }
 
     @PATCH

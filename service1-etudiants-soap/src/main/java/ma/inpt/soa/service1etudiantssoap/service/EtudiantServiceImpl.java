@@ -8,7 +8,11 @@ import javax.persistence.Persistence;
 import javax.persistence.EntityTransaction;
 import java.util.List;
 
-@WebService(endpointInterface = "ma.inpt.soa.service1etudiantssoap.service.IEtudiantService", serviceName = "EtudiantService")
+@WebService(
+    endpointInterface = "ma.inpt.soa.service1etudiantssoap.service.IEtudiantService",
+    serviceName = "EtudiantService",
+    targetNamespace = "http://service1.soa.inpt.ma/"
+)
 public class EtudiantServiceImpl implements IEtudiantService {
 
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("EtudiantsPU");
