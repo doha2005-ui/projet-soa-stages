@@ -1,0 +1,165 @@
+{
+  "info": {
+    "_postman_id": "b3e94a82-3d71-4a81-9b19-candidatures4",
+    "name": "Service 4 — Candidatures REST (Membre 3)",
+    "description": "Collection Postman pour les tests du Service 4 (Gestion des candidatures)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/service4-candidatures-rest/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Lister toutes les candidatures",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/candidatures",
+          "host": ["{{baseUrl}}"],
+          "path": ["candidatures"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Statut HTTP 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Format de réponse JSON valide\", function () {",
+              "    pm.response.to.be.json;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Consulter une candidature par ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/candidatures/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["candidatures", "1"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Statut HTTP 200 ou 404\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Déposer une candidature (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"offreId\": 1,\n  \"offreTitre\": \"Stage PFE - Architectures Microservices & DevOps\",\n  \"entrepriseNom\": \"TechSolutions Maroc\",\n  \"etudiantId\": 1,\n  \"etudiantNom\": \"Benali Yassine\",\n  \"etudiantEmail\": \"yassine.benali@inpt.ac.ma\",\n  \"statut\": \"déposée\",\n  \"motivation\": \"Très motivé par les architectures distribuées et le cloud native.\",\n  \"orchestrateur\": \"REST (Service 4 direct)\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/candidatures",
+          "host": ["{{baseUrl}}"],
+          "path": ["candidatures"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Statut HTTP 201 Created ou 409 Conflict\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Mettre à jour le statut (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"statut\": \"en cours d'évaluation\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/candidatures/1/statut",
+          "host": ["{{baseUrl}}"],
+          "path": ["candidatures", "1", "statut"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Statut HTTP 200 OK\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Supprimer une candidature (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/candidatures/999",
+          "host": ["{{baseUrl}}"],
+          "path": ["candidatures", "999"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Statut HTTP 204 ou 404 Not Found\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

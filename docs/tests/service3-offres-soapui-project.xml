@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="9e88cb92-80cf-46d5-a7b3-service3offres" activeEnvironment="Default" name="Service 3 - Offres SOAP" soapui-version="5.7.0" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:WsdlInterface" id="a3424d85-5b48-433b-8515-offresinterface" wsaVersion="NONE" name="OffrePortBinding" type="wsdl" bindingName="{http://service3.soa.inpt.ma/}OffrePortBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/service3-offres-soap/OffreService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:definitionCache/>
+    <con:endpoints>
+      <con:endpoint>http://localhost:8080/service3-offres-soap/OffreService</con:endpoint>
+    </con:endpoints>
+
+    <!-- Opération listerOffres -->
+    <con:operation id="op-listerOffres" isOneWay="false" action="" name="listerOffres" bindingOperationName="listerOffres" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="req-listerOffres" name="Requête 1 - Lister toutes les offres">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://localhost:8080/service3-offres-soap/OffreService</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service3.soa.inpt.ma/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:listerOffres/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+      </con:call>
+    </con:operation>
+
+    <!-- Opération consulterOffre -->
+    <con:operation id="op-consulterOffre" isOneWay="false" action="" name="consulterOffre" bindingOperationName="consulterOffre" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="req-consulterOffre" name="Requête 2 - Consulter offre par ID">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://localhost:8080/service3-offres-soap/OffreService</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service3.soa.inpt.ma/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:consulterOffre>
+         <id>1</id>
+      </ser:consulterOffre>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+      </con:call>
+    </con:operation>
+
+    <!-- Opération verifierDisponibilite -->
+    <con:operation id="op-verifierDisponibilite" isOneWay="false" action="" name="verifierDisponibilite" bindingOperationName="verifierDisponibilite" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="req-verifierDisponibilite" name="Requête 3 - Vérifier disponibilité">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://localhost:8080/service3-offres-soap/OffreService</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service3.soa.inpt.ma/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:verifierDisponibilite>
+         <offreId>1</offreId>
+      </ser:verifierDisponibilite>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+      </con:call>
+    </con:operation>
+
+    <!-- Opération reserverPlace -->
+    <con:operation id="op-reserverPlace" isOneWay="false" action="" name="reserverPlace" bindingOperationName="reserverPlace" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="req-reserverPlace" name="Requête 4 - Réserver une place">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://localhost:8080/service3-offres-soap/OffreService</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service3.soa.inpt.ma/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:reserverPlace>
+         <offreId>1</offreId>
+      </ser:reserverPlace>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+      </con:call>
+    </con:operation>
+
+    <!-- Opération creerOffre -->
+    <con:operation id="op-creerOffre" isOneWay="false" action="" name="creerOffre" bindingOperationName="creerOffre" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="req-creerOffre" name="Requête 5 - Déposer une nouvelle offre">
+        <con:settings/>
+        <con:encoding>UTF-8</con:encoding>
+        <con:endpoint>http://localhost:8080/service3-offres-soap/OffreService</con:endpoint>
+        <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service3.soa.inpt.ma/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:creerOffre>
+         <offre>
+            <titre>Stage Ingénieur Cloud et DevOps</titre>
+            <entrepriseNom>TechSolutions Maroc</entrepriseNom>
+            <lieu>Casablanca, Technopark</lieu>
+            <type>PFE (Projet de Fin d'Études)</type>
+            <duree>6 mois</duree>
+            <remuneration>5000 DH / mois</remuneration>
+            <competences>Terraform, Ansible, Kubernetes, Jenkins</competences>
+            <description>Participation à l'automatisation de l'infrastructure et au déploiement continu.</description>
+            <active>true</active>
+         </offre>
+      </ser:creerOffre>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        <con:credentials>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+      </con:call>
+    </con:operation>
+  </con:interface>
+</con:soapui-project>

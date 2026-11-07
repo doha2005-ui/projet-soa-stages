@@ -129,6 +129,7 @@ function setupRoleSelector() {
       btn.classList.add('active');
       CONFIG.setActiveRole(role);
       renderNavigation();
+      handleNavigation();
       showToast(`Vue filtrée : ${btn.textContent}`, 'info');
     });
   });
