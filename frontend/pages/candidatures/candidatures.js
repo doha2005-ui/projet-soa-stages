@@ -1,8 +1,9 @@
 /**
  * frontend/pages/candidatures/candidatures.js
  * Membre 3 : Service 4 Candidatures (REST Jersey)
- * Pages : candidatures (dépôt, suivi des dossiers, évaluation, transitions de statuts)
+ * Pages : candidatures (depot, suivi des dossiers, evaluation, transitions de statuts)
  * Intégration : Architecture hybride REST direct & Orchestration BPMN Bonita
+ * Design : Professionnel, épuré, sans emojis, conforme aux standards institutionnels
  */
 
 import { CONFIG } from '../../shared/config.js';
@@ -10,6 +11,14 @@ import { restCall, showToast } from '../../shared/api.js';
 
 let candidaturesCache = [];
 let filtreStatutActif = 'ALL';
+
+// Icones SVG vectorielles (Style Feather / Lucide)
+const ICONS = {
+  search: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+  calendar: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+  building: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="22.01"></line><line x1="15" y1="22" x2="15" y2="22.01"></line></svg>`,
+  fileText: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`
+};
 
 export async function render(container) {
   const preselectedOffreId = sessionStorage.getItem('candidature_preselected_offre_id');
@@ -24,31 +33,30 @@ export async function render(container) {
 
   const canApply = isAll || isEtudiant;
 
-  // En-tête contextuel selon le rôle de l'utilisateur
   let roleTitle = "Gestion des Candidatures";
   let roleSubtitle = "Dépôt de dossiers de stage, suivi de l'avancement et transitions de statuts";
   let roleBannerHtml = "";
 
   if (isEtudiant) {
-    roleTitle = "Mes Candidatures de Stage";
-    roleSubtitle = "Suivez en direct l'évaluation de vos dossiers auprès des entreprises et coordinateurs";
+    roleTitle = "Mes Candidatures";
+    roleSubtitle = "Suivi de l'avancement de vos dossiers auprès des entreprises et de l'administration";
     roleBannerHtml = `
       <div class="role-context-banner student-banner">
-        <span>🎓 <strong>Espace Candidat :</strong> Retrouvez l'historique de vos candidatures déposées. Vous pouvez consulter les détails de votre dossier ou l'annuler tant qu'il n'est pas encore accepté.</span>
+        <span><strong>Espace Candidat :</strong> Consultez vos dossiers déposés. Vous pouvez annuler votre candidature tant qu'elle est en cours d'évaluation.</span>
       </div>`;
   } else if (isEntreprise) {
-    roleTitle = "Évaluation des Candidatures Reçues";
-    roleSubtitle = "Examinez les profils des étudiants postulants, lisez leurs motivations et validez les candidatures";
+    roleTitle = "Évaluation des Candidatures";
+    roleSubtitle = "Examen des profils étudiants, consultation des motivations et prise de décision";
     roleBannerHtml = `
       <div class="role-context-banner company-banner">
-        <span>🏢 <strong>Espace Recruteur Entreprise :</strong> Évaluez les candidatures associées à vos offres de stage. Vous pouvez changer le statut (En cours d'évaluation, Acceptée, Refusée).</span>
+        <span><strong>Espace Recruteur Entreprise :</strong> Évaluez les candidatures associées à vos offres et appliquez les transitions d'état.</span>
       </div>`;
   } else if (isResponsable) {
     roleTitle = "Supervision Globale des Candidatures";
     roleSubtitle = "Observabilité académique de l'attribution des stages et du flux d'orchestration";
     roleBannerHtml = `
       <div class="role-context-banner admin-banner">
-        <span>👔 <strong>Espace Responsable Pédagogique :</strong> Vue d'ensemble sur le vivier d'étudiants ayant postulé et vérification des validations finales.</span>
+        <span><strong>Espace Responsable Pédagogique :</strong> Vue d'ensemble sur le vivier d'étudiants ayant postulé et vérification des validations finales.</span>
       </div>`;
   } else {
     roleBannerHtml = `
@@ -106,6 +114,21 @@ export async function render(container) {
         background: #f8fafc;
         box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
       }
+      .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #cbd5e1;
+      }
+      .kpi-card#kpi-all::before { background: var(--primary); }
+      .kpi-card#kpi-deposee::before { background: #64748b; }
+      .kpi-card#kpi-encours::before { background: #d97706; }
+      .kpi-card#kpi-acceptee::before { background: #059669; }
+      .kpi-card#kpi-refusee::before { background: #dc2626; }
+
       .kpi-val {
         font-size: 1.5rem;
         font-weight: 700;
@@ -138,14 +161,16 @@ export async function render(container) {
       }
       .search-box input {
         width: 100%;
-        padding-left: 2rem;
+        padding-left: 2.2rem;
       }
       .search-box-icon {
         position: absolute;
-        left: 0.65rem;
+        left: 0.75rem;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-light);
+        display: flex;
+        align-items: center;
         pointer-events: none;
       }
 
@@ -165,7 +190,7 @@ export async function render(container) {
       .table-card {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-md);
         overflow: hidden;
         box-shadow: var(--shadow-sm);
       }
@@ -205,34 +230,34 @@ export async function render(container) {
 
     ${roleBannerHtml}
 
-    <!-- Bandeau KPI interactif -->
+    <!-- Bandeau KPI interactif sans emojis -->
     <div class="kpi-row">
       <div class="kpi-card active" data-filter="ALL" id="kpi-all">
         <div class="kpi-val" style="color: var(--primary);" id="val-total">--</div>
-        <div class="kpi-label">📊 Toutes les candidatures</div>
+        <div class="kpi-label">Total candidatures</div>
       </div>
       <div class="kpi-card" data-filter="déposée" id="kpi-deposee">
         <div class="kpi-val" style="color: #475569;" id="val-deposees">--</div>
-        <div class="kpi-label">📥 Nouvelles déposées</div>
+        <div class="kpi-label">Dossiers déposés</div>
       </div>
       <div class="kpi-card" data-filter="en cours d'évaluation" id="kpi-encours">
         <div class="kpi-val" style="color: #d97706;" id="val-encours">--</div>
-        <div class="kpi-label">⏳ En cours d'évaluation</div>
+        <div class="kpi-label">En cours d'évaluation</div>
       </div>
       <div class="kpi-card" data-filter="acceptée" id="kpi-acceptee">
-        <div class="kpi-val" style="color: #16a34a;" id="val-acceptees">--</div>
-        <div class="kpi-label">✅ Retenues / Acceptées</div>
+        <div class="kpi-val" style="color: #059669;" id="val-acceptees">--</div>
+        <div class="kpi-label">Candidatures acceptées</div>
       </div>
       <div class="kpi-card" data-filter="refusée" id="kpi-refusee">
         <div class="kpi-val" style="color: #dc2626;" id="val-refusees">--</div>
-        <div class="kpi-label">❌ Non retenues</div>
+        <div class="kpi-label">Candidatures refusées</div>
       </div>
     </div>
 
     <!-- Filtres & Recherche -->
     <div class="filter-toolbar">
       <div class="search-box">
-        <span class="search-box-icon">🔍</span>
+        <span class="search-box-icon">${ICONS.search}</span>
         <input type="text" id="cand-search-input" class="form-input" placeholder="Rechercher par candidat, email, intitulé du stage ou entreprise...">
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -312,12 +337,12 @@ export async function render(container) {
               <option value="BPMN">Processus Métier Bonita BPMN (Orchestration - Membre 4)</option>
             </select>
             <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
-              Conforme au cahier des charges : Le service REST communique avec le processus Bonita pour le suivi d'avancement.
+              Conforme aux spécifications : Le service REST communique avec le processus Bonita pour le suivi d'avancement.
             </small>
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
             <button type="button" class="btn btn-outline" id="cand-cancel-btn">Annuler</button>
-            <button type="submit" class="btn btn-primary">Soumettre mon dossier</button>
+            <button type="submit" class="btn btn-primary">Soumettre le dossier</button>
           </div>
         </form>
       </div>
@@ -483,9 +508,8 @@ function afficherCandidatures(liste) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">
-          <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">📂</div>
           <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">Aucune candidature correspondante</p>
-          <p style="font-size: 0.8rem;">Modifiez vos critères de recherche ou sélectionnez un autre statut.</p>
+          <p style="font-size: 0.8rem;">Modifiez vos termes de recherche ou sélectionnez un autre statut.</p>
         </td>
       </tr>`;
     return;
@@ -495,9 +519,8 @@ function afficherCandidatures(liste) {
   const isEtudiant = currentRole === 'etudiant';
   const isEntreprise = currentRole === 'entreprise';
   const isResponsable = currentRole === 'responsable';
-  const isAll = currentRole === 'all';
 
-  const avatarColors = ['#2563eb', '#7c3aed', '#059669', '#d97706', '#db2777', '#0891b2'];
+  const avatarColors = ['#1d4ed8', '#6d28d9', '#047857', '#b45309', '#be185d', '#0e7490'];
 
   tbody.innerHTML = liste.map((item, idx) => {
     const badgeClass = getStatusClass(item.statut);
@@ -507,36 +530,33 @@ function afficherCandidatures(liste) {
       ? `<span class="badge-type badge-bpmn" title="Déclenché via Bonita BPMN">BPMN Bonita</span>`
       : `<span class="badge-type badge-rest" title="Appel direct REST Service 4">REST Direct</span>`;
 
-    // Initiales candidat pour l'avatar
     const initials = item.etudiantNom
       ? item.etudiantNom.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
       : 'ET';
     const avatarColor = avatarColors[idx % avatarColors.length];
 
-    // Rendu de la colonne action selon le rôle
     let actionCellHtml = "";
     if (isEtudiant) {
       if (item.statut === 'acceptée') {
-        actionCellHtml = `<span style="font-size: 0.78rem; font-weight: 600; color: var(--success);">🎉 Stage validé</span>`;
+        actionCellHtml = `<span style="font-size: 0.78rem; font-weight: 600; color: var(--success);">Dossier validé</span>`;
       } else if (item.statut === 'refusée') {
         actionCellHtml = `<span style="font-size: 0.78rem; color: var(--text-muted);">Dossier clos</span>`;
       } else {
         actionCellHtml = `
           <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5; font-size: 0.72rem; padding: 3px 8px;" onclick="window.annulerCandidature(${item.id})">
-            🗑️ Annuler dossier
+            Annuler le dossier
           </button>`;
       }
     } else if (isEntreprise || isResponsable) {
       actionCellHtml = `
         <select class="form-select" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.75rem; display: inline-block; font-weight: 500;" onchange="window.changerStatutCandidature(${item.id}, this.value)">
-          <option value="" disabled selected>Changer statut...</option>
-          <option value="déposée" ${item.statut === 'déposée' ? 'disabled' : ''}>📥 Déposée</option>
-          <option value="en cours d'évaluation" ${item.statut === "en cours d'évaluation" ? 'disabled' : ''}>⏳ En évaluation</option>
-          <option value="acceptée" ${item.statut === 'acceptée' ? 'disabled' : ''}>✅ Accepter candidat</option>
-          <option value="refusée" ${item.statut === 'refusée' ? 'disabled' : ''}>❌ Refuser dossier</option>
+          <option value="" disabled selected>Modifier statut...</option>
+          <option value="déposée" ${item.statut === 'déposée' ? 'disabled' : ''}>Déposée</option>
+          <option value="en cours d'évaluation" ${item.statut === "en cours d'évaluation" ? 'disabled' : ''}>En évaluation</option>
+          <option value="acceptée" ${item.statut === 'acceptée' ? 'disabled' : ''}>Accepter candidat</option>
+          <option value="refusée" ${item.statut === 'refusée' ? 'disabled' : ''}>Refuser dossier</option>
         </select>`;
     } else {
-      // Vue "Tous les services" (Admin / Jury / Développeur)
       actionCellHtml = `
         <div style="display: flex; gap: 0.35rem; justify-content: flex-end; align-items: center;">
           <select class="form-select" style="width: auto; padding: 0.2rem 0.4rem; font-size: 0.72rem;" onchange="window.changerStatutCandidature(${item.id}, this.value)">
@@ -546,7 +566,7 @@ function afficherCandidatures(liste) {
             <option value="acceptée">Acceptée</option>
             <option value="refusée">Refusée</option>
           </select>
-          <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5; padding: 2px 6px; font-size: 0.7rem;" title="Supprimer (DELETE)" onclick="window.annulerCandidature(${item.id})">✕</button>
+          <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5; padding: 2px 6px; font-size: 0.7rem;" title="Supprimer" onclick="window.annulerCandidature(${item.id})">Suppr.</button>
         </div>`;
     }
 
@@ -556,7 +576,7 @@ function afficherCandidatures(liste) {
         <td>
           <div style="font-weight: 600; color: var(--text-main); line-height: 1.3;">${escapeHtml(item.offreTitre)}</div>
           <div style="font-size: 0.75rem; color: var(--primary); font-weight: 500; margin-top: 2px;">
-            🏢 ${escapeHtml(item.entrepriseNom)}
+            ${escapeHtml(item.entrepriseNom)}
           </div>
         </td>
         <td>
@@ -569,13 +589,13 @@ function afficherCandidatures(liste) {
           </div>
         </td>
         <td style="white-space: nowrap; color: var(--text-muted); font-size: 0.8rem;">
-          📅 ${escapeHtml(item.dateDepot)}
+          ${escapeHtml(item.dateDepot)}
         </td>
         <td>${orchBadge}</td>
         <td><span class="status-badge ${badgeClass}">${statusLabel}</span></td>
         <td style="text-align: center;">
-          <button class="btn btn-outline btn-sm" style="padding: 2px 7px; font-size: 0.75rem;" onclick="window.ouvrirDetailDossier(${item.id})" title="Lire la motivation et les informations complètes">
-            👁️ Voir
+          <button class="btn btn-outline btn-sm" style="padding: 2px 7px; font-size: 0.75rem;" onclick="window.ouvrirDetailDossier(${item.id})" title="Consulter la motivation et les informations">
+            Consulter
           </button>
         </td>
         <td style="text-align: right;">
@@ -598,10 +618,10 @@ function getStatusClass(statut) {
 
 function getStatusLabel(statut) {
   switch ((statut || '').toLowerCase()) {
-    case 'déposée': return '📥 Déposée';
-    case "en cours d'évaluation": return '⏳ En cours';
-    case 'acceptée': return '✅ Acceptée';
-    case 'refusée': return '❌ Refusée';
+    case 'déposée': return 'Déposée';
+    case "en cours d'évaluation": return 'En évaluation';
+    case 'acceptée': return 'Acceptée';
+    case 'refusée': return 'Refusée';
     default: return statut || 'Déposée';
   }
 }
@@ -668,7 +688,7 @@ async function soumettreCandidature() {
       }
     );
 
-    showToast(`Candidature soumise avec succès via ${route === 'BPMN' ? 'Orchestration BPMN' : 'REST Service 4'} !`, 'success');
+    showToast(`Candidature soumise avec succès via ${route === 'BPMN' ? 'Orchestration BPMN' : 'REST Service 4'}.`, 'success');
     fermerModal();
     mettreAJourKPIs();
     appliquerFiltres();
@@ -690,9 +710,9 @@ window.ouvrirDetailDossier = function(id) {
   const body = document.getElementById('detail-modal-body');
   body.innerHTML = `
     <div style="margin-bottom: 1rem;">
-      <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-light); font-weight: 700;">Sujet de stage visé</div>
+      <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.04em;">Sujet de stage visé</div>
       <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">${escapeHtml(item.offreTitre)}</div>
-      <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">🏢 ${escapeHtml(item.entrepriseNom)}</div>
+      <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">${escapeHtml(item.entrepriseNom)}</div>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; background: var(--surface-alt); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1rem;">
@@ -718,7 +738,7 @@ window.ouvrirDetailDossier = function(id) {
       </div>
     </div>
 
-    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-light); font-weight: 700;">Lettre & Argumentaire de motivation</div>
+    <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.04em;">Lettre & Argumentaire de motivation</div>
     <div class="modal-quote">
       "${escapeHtml(item.motivation)}"
     </div>
@@ -727,9 +747,9 @@ window.ouvrirDetailDossier = function(id) {
       <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
         <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">Décision du recruteur :</div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <button class="btn btn-outline btn-sm" onclick="window.changerStatutDepuisModal(${item.id}, 'en cours d\\'évaluation')">⏳ Passer en évaluation</button>
-          <button class="btn btn-primary btn-sm" style="background: var(--success); border-color: var(--success);" onclick="window.changerStatutDepuisModal(${item.id}, 'acceptée')">✅ Accepter la candidature</button>
-          <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5;" onclick="window.changerStatutDepuisModal(${item.id}, 'refusée')">❌ Refuser</button>
+          <button class="btn btn-outline btn-sm" onclick="window.changerStatutDepuisModal(${item.id}, 'en cours d\\'évaluation')">Mettre en évaluation</button>
+          <button class="btn btn-primary btn-sm" style="background: var(--success); border-color: var(--success);" onclick="window.changerStatutDepuisModal(${item.id}, 'acceptée')">Accepter la candidature</button>
+          <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5;" onclick="window.changerStatutDepuisModal(${item.id}, 'refusée')">Refuser</button>
         </div>
       </div>` : ''}
   `;
@@ -771,7 +791,7 @@ window.changerStatutCandidature = async function(id, nouveauStatut) {
 };
 
 window.annulerCandidature = async function(id) {
-  if (!confirm('Confirmez-vous l\'annulation de cette candidature ? Cette action est irréversible.')) return;
+  if (!confirm('Confirmez-vous l\'annulation de cette candidature ?')) return;
   try {
     const serviceInfo = CONFIG.services.candidatures;
     await restCall(

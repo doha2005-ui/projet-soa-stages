@@ -1,7 +1,8 @@
 /**
  * frontend/pages/offres/offres.js
  * Membre 3 : Service 3 Offres (SOAP JAX-WS)
- * Pages : offres (catalogue, publication, modification, réservation de places)
+ * Pages : offres (catalogue, publication, modification, reservation de places)
+ * Design : Professionnel, epure, sans emojis, conforme aux standards institutionnels
  */
 
 import { CONFIG } from '../../shared/config.js';
@@ -9,6 +10,21 @@ import { soapCall, getXmlNodeText } from '../../shared/soap.js';
 import { showToast } from '../../shared/api.js';
 
 let offresCache = [];
+
+// Icones SVG vectorielles epurees (Style Feather / Lucide)
+const ICONS = {
+  search: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+  building: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="22.01"></line><line x1="15" y1="22" x2="15" y2="22.01"></line></svg>`,
+  mapPin: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+  calendar: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+  clock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+  dollar: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+  check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+  briefcase: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
+  users: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+  award: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>`,
+  cpu: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>`
+};
 
 export async function render(container) {
   const currentRole = CONFIG.activeRole;
@@ -19,31 +35,30 @@ export async function render(container) {
 
   const canPublishOffre = isAll || isEntreprise;
 
-  // En-tête contextuel selon le rôle de l'utilisateur
   let roleTitle = "Offres de Stages";
   let roleSubtitle = "Catalogue des stages PFE et d'application proposés par nos entreprises partenaires";
   let roleBannerHtml = "";
 
   if (isEtudiant) {
-    roleTitle = "Catalogue des Stages Disponibles";
-    roleSubtitle = "Consultez les offres déposées par les entreprises partenaires et postulez directement";
+    roleTitle = "Catalogue des Stages";
+    roleSubtitle = "Consultez les offres disponibles des entreprises partenaires et postulez en ligne";
     roleBannerHtml = `
       <div class="role-context-banner student-banner">
-        <span>🎓 <strong>Espace Candidat :</strong> Sélectionnez l'offre qui correspond à vos compétences et postulez en ligne. Votre dossier sera immédiatement transmis à l'entreprise et aux coordinateurs.</span>
+        <span><strong>Espace Candidat :</strong> Parcourez les offres de stage, vérifiez les prérequis et soumettez votre dossier directement.</span>
       </div>`;
   } else if (isEntreprise) {
-    roleTitle = "Gestion de vos Offres de Stage";
-    roleSubtitle = "Déposez vos besoins en compétences, configurez le nombre de places et suivez les disponibilités";
+    roleTitle = "Gestion des Offres de Stage";
+    roleSubtitle = "Publication et suivi des offres de stage via le Service Web SOAP JAX-WS";
     roleBannerHtml = `
       <div class="role-context-banner company-banner">
-        <span>🏢 <strong>Espace Entreprise Recruteur :</strong> Publiez vos offres de PFE et stages techniques via le Service Web JAX-WS SOAP. Vous pouvez modifier ou clôturer une offre à tout moment.</span>
+        <span><strong>Espace Recruteur Entreprise :</strong> Déposez vos offres de stage, définissez les quotas de places et ajustez la disponibilité.</span>
       </div>`;
   } else if (isResponsable) {
     roleTitle = "Supervision Pédagogique des Offres";
-    roleSubtitle = "Contrôle qualité académique des sujets proposés et suivi des quotas de places";
+    roleSubtitle = "Validation académique des sujets de stages et contrôle de la conformité des offres";
     roleBannerHtml = `
       <div class="role-context-banner admin-banner">
-        <span>👔 <strong>Espace Responsable Stages :</strong> Vérification de la conformité pédagogique des offres et validation des conventions.</span>
+        <span><strong>Espace Responsable Stages :</strong> Vérification de l'adéquation des offres avec les filières et suivi des quotas.</span>
       </div>`;
   } else {
     roleBannerHtml = `
@@ -54,7 +69,7 @@ export async function render(container) {
             <span class="badge-type badge-soap">SOAP JAX-WS</span>
             <span class="text-muted" style="font-size: 0.8rem;">Endpoint : <code>${CONFIG.services.offres.endpoint}</code></span>
           </div>
-          <button class="btn btn-outline btn-sm" id="btn-ping-soap" title="Tester la connectivité du service JAX-WS">⚡ Ping Service 3 (SOAP)</button>
+          <button class="btn btn-outline btn-sm" id="btn-ping-soap" title="Tester la connectivité du service JAX-WS">Ping Service SOAP</button>
         </div>
       </div>`;
   }
@@ -92,19 +107,18 @@ export async function render(container) {
         box-shadow: var(--shadow-sm);
       }
       .stat-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: var(--radius-md);
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
       }
-      .stat-icon.blue { background: #dbeafe; color: #1e40af; }
-      .stat-icon.purple { background: #f3e8ff; color: #7e22ce; }
-      .stat-icon.green { background: #dcfce7; color: #15803d; }
-      .stat-icon.amber { background: #fef3c7; color: #b45309; }
-      .stat-val { font-size: 1.35rem; font-weight: 700; color: var(--text-main); line-height: 1.1; }
+      .stat-icon.blue { background: #eff6ff; color: #1d4ed8; }
+      .stat-icon.purple { background: #f5f3ff; color: #6d28d9; }
+      .stat-icon.green { background: #ecfdf5; color: #047857; }
+      .stat-icon.amber { background: #fffbeb; color: #b45309; }
+      .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--text-main); line-height: 1.1; }
       .stat-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
       .filter-toolbar {
@@ -127,21 +141,23 @@ export async function render(container) {
       }
       .search-box input {
         width: 100%;
-        padding-left: 2rem;
+        padding-left: 2.2rem;
       }
       .search-box-icon {
         position: absolute;
-        left: 0.65rem;
+        left: 0.75rem;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-light);
+        display: flex;
+        align-items: center;
         pointer-events: none;
       }
 
       .offre-card {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-md);
         padding: 1.25rem;
         display: flex;
         flex-direction: column;
@@ -151,8 +167,8 @@ export async function render(container) {
         overflow: hidden;
       }
       .offre-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.07);
         border-color: #cbd5e1;
       }
       .offre-card::before {
@@ -161,45 +177,53 @@ export async function render(container) {
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary), #60a5fa);
+        height: 3px;
+        background: var(--primary);
       }
       .offre-card.technique::before {
-        background: linear-gradient(90deg, #0d9488, #2dd4bf);
+        background: #0d9488;
       }
       .offre-card.initiation::before {
-        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        background: #d97706;
       }
 
       .badge-avail {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         font-weight: 600;
-        padding: 3px 8px;
+        padding: 3px 9px;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 5px;
       }
       .badge-avail.open {
-        background: #dcfce7;
-        color: #15803d;
-        border: 1px solid #bbf7d0;
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
       }
       .badge-avail.closed {
-        background: #fee2e2;
+        background: #fef2f2;
         color: #b91c1c;
         border: 1px solid #fecaca;
       }
+      .avail-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .badge-avail.open .avail-dot { background: #059669; }
+      .badge-avail.closed .avail-dot { background: #dc2626; }
 
       .skill-pill {
         display: inline-block;
-        background: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
+        background: #f1f5f9;
+        color: #334155;
+        border: 1px solid #e2e8f0;
         font-size: 0.72rem;
         font-weight: 500;
         padding: 2px 8px;
-        border-radius: 12px;
+        border-radius: 4px;
         margin-right: 4px;
         margin-bottom: 4px;
       }
@@ -210,7 +234,7 @@ export async function render(container) {
         gap: 0.5rem;
         background: var(--surface-alt);
         border-radius: var(--radius-sm);
-        padding: 0.6rem 0.75rem;
+        padding: 0.65rem 0.75rem;
         margin: 0.85rem 0;
         font-size: 0.78rem;
       }
@@ -222,7 +246,12 @@ export async function render(container) {
         font-size: 0.68rem;
         color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 2px;
       }
       .spec-item-val {
         font-weight: 600;
@@ -245,31 +274,31 @@ export async function render(container) {
 
     ${roleBannerHtml}
 
-    <!-- Barre d'indicateurs KPI -->
+    <!-- Barre d'indicateurs KPI epuree -->
     <div class="stats-strip">
       <div class="stat-box">
-        <div class="stat-icon blue">💼</div>
+        <div class="stat-icon blue">${ICONS.briefcase}</div>
         <div>
           <div class="stat-val" id="stat-total-offres">--</div>
           <div class="stat-desc">Offres publiées</div>
         </div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon purple">🎓</div>
+        <div class="stat-icon purple">${ICONS.award}</div>
         <div>
           <div class="stat-val" id="stat-pfe-offres">--</div>
           <div class="stat-desc">Sujets PFE 3ème année</div>
         </div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon green">👥</div>
+        <div class="stat-icon green">${ICONS.users}</div>
         <div>
           <div class="stat-val" id="stat-places-dispo">--</div>
           <div class="stat-desc">Places disponibles</div>
         </div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon amber">⚙️</div>
+        <div class="stat-icon amber">${ICONS.cpu}</div>
         <div>
           <div class="stat-val" id="stat-tech-offres">--</div>
           <div class="stat-desc">Stages Techniques / Init.</div>
@@ -280,7 +309,7 @@ export async function render(container) {
     <!-- Barre de recherche et filtres de catalogue -->
     <div class="filter-toolbar">
       <div class="search-box">
-        <span class="search-box-icon">🔍</span>
+        <span class="search-box-icon">${ICONS.search}</span>
         <input type="text" id="offre-search" class="form-input" placeholder="Rechercher par intitulé, compétence, mot-clé, ville ou entreprise...">
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -529,10 +558,9 @@ function afficherOffres(liste) {
 
   if (liste.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-lg);">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
-        <p style="font-weight: 600; color: var(--text-main);">Aucune offre ne correspond à vos critères de recherche</p>
-        <p style="font-size: 0.85rem;">Essayez d'élargir votre recherche ou de réinitialiser les filtres.</p>
+      <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-md);">
+        <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">Aucune offre ne correspond à vos critères</p>
+        <p style="font-size: 0.85rem;">Modifiez vos termes de recherche ou réinitialisez les filtres.</p>
       </div>`;
     return;
   }
@@ -543,12 +571,10 @@ function afficherOffres(liste) {
   const isAll = currentRole === 'all';
 
   container.innerHTML = liste.map(offre => {
-    // Classes de style selon le type
     let cardClass = "offre-card";
     if ((offre.type || '').includes('Technique')) cardClass += " technique";
     if ((offre.type || '').includes('Initiation')) cardClass += " initiation";
 
-    // Badges de compétences
     const skillsList = (offre.competences || '')
       .split(',')
       .map(s => s.trim())
@@ -558,19 +584,17 @@ function afficherOffres(liste) {
       ? skillsList.map(skill => `<span class="skill-pill">${escapeHtml(skill)}</span>`).join('')
       : `<span style="font-size: 0.75rem; color: var(--text-muted);">Non spécifié</span>`;
 
-    // Disponibilité
     const isAvailable = (offre.placesDisponibles > 0) && offre.active;
     const availBadge = isAvailable
-      ? `<span class="badge-avail open">● ${offre.placesDisponibles} place(s)</span>`
-      : `<span class="badge-avail closed">● Clôturée</span>`;
+      ? `<span class="badge-avail open"><span class="avail-dot"></span>${offre.placesDisponibles} place(s)</span>`
+      : `<span class="badge-avail closed"><span class="avail-dot"></span>Clôturée</span>`;
 
-    // Actions selon le rôle
     let actionsHtml = "";
     if (isEtudiant) {
       if (isAvailable) {
         actionsHtml = `
           <a href="#candidatures" class="btn btn-primary btn-sm" style="width: 100%; text-align: center;" onclick="window.postulerAOffre(${offre.id}, '${escapeHtml(offre.titre)}', '${escapeHtml(offre.entrepriseNom)}')">
-            Postuler à ce stage →
+            Postuler à cette offre &rarr;
           </a>`;
       } else {
         actionsHtml = `<button class="btn btn-outline btn-sm" disabled style="width: 100%; opacity: 0.6;">Places épuisées</button>`;
@@ -578,21 +602,21 @@ function afficherOffres(liste) {
     } else if (isEntreprise) {
       actionsHtml = `
         <div style="display: flex; gap: 0.5rem; width: 100%; justify-content: flex-end;">
-          <button class="btn btn-outline btn-sm" onclick="window.editerOffre(${offre.id})">✏️ Modifier</button>
-          <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fecaca;" onclick="window.supprimerOffre(${offre.id})">🗑️ Clôturer</button>
+          <button class="btn btn-outline btn-sm" onclick="window.editerOffre(${offre.id})">Modifier</button>
+          <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fecaca;" onclick="window.supprimerOffre(${offre.id})">Clôturer</button>
         </div>`;
     } else if (isAll) {
       actionsHtml = `
         <div style="display: flex; gap: 0.5rem; width: 100%; justify-content: space-between; align-items: center;">
           <button class="btn btn-outline btn-sm" onclick="window.editerOffre(${offre.id})">Modifier</button>
           <a href="#candidatures" class="btn btn-primary btn-sm" onclick="window.postulerAOffre(${offre.id}, '${escapeHtml(offre.titre)}', '${escapeHtml(offre.entrepriseNom)}')">
-            Postuler →
+            Postuler &rarr;
           </a>
         </div>`;
     } else {
       actionsHtml = `
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Consultation pédagogique</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Consultation académique</span>
           <button class="btn btn-outline btn-sm" onclick="window.verifierCompatibiliteModal(${offre.id})">Vérifier Règle JAX-WS</button>
         </div>`;
     }
@@ -600,7 +624,6 @@ function afficherOffres(liste) {
     return `
       <div class="${cardClass}">
         <div>
-          <!-- En-tête de la carte -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.6rem;">
             <div>
               <span class="member-chip" style="font-size: 0.7rem; font-weight: 600;">${escapeHtml(offre.type)}</span>
@@ -608,44 +631,43 @@ function afficherOffres(liste) {
             ${availBadge}
           </div>
 
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; line-height: 1.3;">
+          <h3 style="font-size: 1.12rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; line-height: 1.35;">
             ${escapeHtml(offre.titre)}
           </h3>
 
-          <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-bottom: 0.75rem;">
-            🏢 ${escapeHtml(offre.entrepriseNom)} <span style="color: var(--text-light); margin: 0 4px;">•</span> 📍 ${escapeHtml(offre.lieu)}
+          <div style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <span>${escapeHtml(offre.entrepriseNom)}</span>
+            <span style="color: var(--text-light);">&bull;</span>
+            <span style="color: var(--text-muted); font-weight: 400;">${escapeHtml(offre.lieu)}</span>
           </div>
 
           <p style="font-size: 0.83rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
             ${escapeHtml(offre.description || 'Aucune description spécifiée.')}
           </p>
 
-          <!-- Grille de spécifications clés -->
           <div class="specs-grid">
             <div class="spec-item">
-              <span class="spec-item-label">Durée</span>
-              <span class="spec-item-val">⏳ ${escapeHtml(offre.duree || '6 mois')}</span>
+              <span class="spec-item-label">${ICONS.clock} Durée</span>
+              <span class="spec-item-val">${escapeHtml(offre.duree || '6 mois')}</span>
             </div>
             <div class="spec-item">
-              <span class="spec-item-label">Gratification</span>
-              <span class="spec-item-val">💰 ${escapeHtml(offre.remuneration || 'Selon profil')}</span>
+              <span class="spec-item-label">${ICONS.dollar} Rémunération</span>
+              <span class="spec-item-val">${escapeHtml(offre.remuneration || 'Selon profil')}</span>
             </div>
             <div class="spec-item">
-              <span class="spec-item-label">Date Limite</span>
-              <span class="spec-item-val">📅 ${escapeHtml(offre.dateLimite || '31/12/2026')}</span>
+              <span class="spec-item-label">${ICONS.calendar} Date Limite</span>
+              <span class="spec-item-val">${escapeHtml(offre.dateLimite || '31/12/2026')}</span>
             </div>
           </div>
 
-          <!-- Tags de compétences requises -->
           <div style="margin-top: 0.65rem;">
-            <div style="font-size: 0.7rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.35rem;">Technologies & Compétences</div>
+            <div style="font-size: 0.68rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.35rem;">Compétences requises</div>
             <div style="display: flex; flex-wrap: wrap;">
               ${skillsHtml}
             </div>
           </div>
         </div>
 
-        <!-- Pied de carte avec les actions contextuelles -->
         <div style="margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px solid var(--border);">
           ${actionsHtml}
         </div>
@@ -753,7 +775,7 @@ async function sauvegarderOffre() {
       }
     });
 
-    showToast(id ? 'Offre mise à jour avec succès via SOAP !' : 'Offre publiée avec succès via SOAP JAX-WS !', 'success');
+    showToast(id ? 'Offre mise à jour avec succès via SOAP.' : 'Offre publiée avec succès via SOAP JAX-WS.', 'success');
     fermerModal();
     mettreAJourKPIs();
     appliquerFiltres();
@@ -790,7 +812,7 @@ async function testerPingSoap() {
     if (res?.xmlDoc) {
       message = getXmlNodeText(res.xmlDoc, 'return', message);
     }
-    showToast(`✅ ${message}`, "success");
+    showToast(`Connexion établie : ${message}`, "success");
   } catch (err) {
     showToast(`Échec du Ping SOAP: ${err.message}`, "error");
   }
@@ -846,7 +868,7 @@ window.verifierCompatibiliteModal = function(id) {
   if (!offre) return;
   const isDispo = offre.placesDisponibles > 0 && offre.active;
   alert(
-    `[Vérification SOAP JAX-WS : verifierCompatibilite]\n\n` +
+    `[Contrôle SOAP JAX-WS : verifierCompatibilite]\n\n` +
     `Offre : #${offre.id} - ${offre.titre}\n` +
     `Entreprise : ${offre.entrepriseNom}\n` +
     `Places restantes : ${offre.placesDisponibles}\n` +
