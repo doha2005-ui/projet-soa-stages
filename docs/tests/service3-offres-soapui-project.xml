@@ -110,6 +110,7 @@
             <remuneration>5000 DH / mois</remuneration>
             <competences>Terraform, Ansible, Kubernetes, Jenkins</competences>
             <description>Participation à l'automatisation de l'infrastructure et au déploiement continu.</description>
+            <placesDisponibles>3</placesDisponibles>
             <active>true</active>
          </offre>
       </ser:creerOffre>
