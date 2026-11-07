@@ -50,14 +50,14 @@ export const CONFIG = {
       member: 'Membre 2',
       endpoint: 'http://localhost:8080/service2-entreprises-soap/services/entreprise',
       namespace: 'http://soap.soa.inpt.ma/',
-      mockFile: 'mock-entreprises.json'
+      mockFile: 'pages/entreprises/mock-entreprises.json'
     },
     stages: {
       name: 'Service 6 : Suivi des Stages',
       type: 'REST',
       member: 'Membre 2',
       endpoint: 'http://localhost:8080/service6-suivi-stages-rest/api/stages',
-      mockFile: 'mock-stages.json'
+      mockFile: 'pages/stages/mock-stages.json'
     },
 
     // Membre 3 : Service 3 (SOAP JAX-WS) & Service 4 (REST Jersey)
