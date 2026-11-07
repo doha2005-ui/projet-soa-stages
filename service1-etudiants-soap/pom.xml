@@ -22,14 +22,11 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- API JAX-WS (Version 2.3.1, car la 2.3.5 n'existe pas pour l'API) -->
     <dependency>
       <groupId>javax.xml.ws</groupId>
       <artifactId>jaxws-api</artifactId>
       <version>2.3.1</version>
     </dependency>
-    
-    <!-- Implémentation JAX-WS (Utilise la variable du parent) -->
     <dependency>
       <groupId>com.sun.xml.ws</groupId>
       <artifactId>jaxws-rt</artifactId>
