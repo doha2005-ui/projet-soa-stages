@@ -14,19 +14,26 @@ export async function render(container) {
   const preselectedOffreId = sessionStorage.getItem('candidature_preselected_offre_id');
   const preselectedOffreTitre = sessionStorage.getItem('candidature_preselected_offre_titre');
 
+  const currentRole = CONFIG.activeRole;
+  const canApply = currentRole === 'all' || currentRole === 'etudiant';
+
+  const roleMetaHtml = currentRole === 'all'
+    ? `<span class="member-chip">Membre 3</span>
+       <span class="badge-type badge-rest">REST Jersey</span>
+       <span class="text-muted" style="font-size: 0.8rem;">Service 4: <code>${CONFIG.services.candidatures.endpoint}</code></span>`
+    : `<span class="member-chip" style="background: #e0f2fe; color: #0369a1;">Vue : ${currentRole === 'etudiant' ? 'Espace Étudiant (Mes Dossiers & Suivi)' : currentRole === 'entreprise' ? 'Espace Entreprise (Évaluation des Candidatures)' : 'Espace Responsable (Supervision & Historique)'}</span>`;
+
   container.innerHTML = `
     <div class="page-header">
       <div>
         <h2 class="page-title">Gestion des Candidatures</h2>
         <p class="page-subtitle">Dépôt de dossiers, suivi de l'avancement et transitions de statuts</p>
         <div class="page-meta">
-          <span class="member-chip">Membre 3</span>
-          <span class="badge-type badge-rest">REST Jersey</span>
-          <span class="text-muted" style="font-size: 0.8rem;">Service 4: <code>${CONFIG.services.candidatures.endpoint}</code></span>
+          ${roleMetaHtml}
         </div>
       </div>
       <div>
-        <button class="btn btn-primary" id="btn-deposer-candidature">+ Déposer une Candidature</button>
+        ${canApply ? `<button class="btn btn-primary" id="btn-deposer-candidature">+ Déposer une Candidature</button>` : ''}
       </div>
     </div>
 
@@ -120,9 +127,12 @@ export async function render(container) {
     filtrerCandidatures(e.target.value);
   });
 
-  document.getElementById('btn-deposer-candidature').addEventListener('click', () => {
-    ouvrirModal();
-  });
+  const btnDeposer = document.getElementById('btn-deposer-candidature');
+  if (btnDeposer) {
+    btnDeposer.addEventListener('click', () => {
+      ouvrirModal();
+    });
+  }
 
   document.getElementById('cand-close-btn').addEventListener('click', fermerModal);
   document.getElementById('cand-cancel-btn').addEventListener('click', fermerModal);
@@ -180,13 +190,18 @@ function afficherCandidatures(liste) {
         <td><span class="member-chip" style="font-size: 0.7rem;">${item.orchestrateur}</span></td>
         <td><span class="status-badge ${badgeClass}">${item.statut}</span></td>
         <td style="text-align: right;">
+          ${(CONFIG.activeRole === 'all' || CONFIG.activeRole === 'entreprise' || CONFIG.activeRole === 'responsable') ? `
           <select class="form-select" style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.75rem; display: inline-block;" onchange="window.changerStatutCandidature(${item.id}, this.value)">
             <option value="" disabled selected>Modifier statut...</option>
             <option value="déposée">Déposée</option>
             <option value="en cours d'évaluation">En cours d'évaluation</option>
             <option value="acceptée">Acceptée</option>
             <option value="refusée">Refusée</option>
-          </select>
+          </select>` : `
+          ${item.statut === 'acceptée'
+            ? `<span class="status-badge status-acceptee" style="font-size: 0.75rem;">Acceptée</span>`
+            : `<button class="btn btn-outline btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; color: #dc2626; border-color: #fca5a5;" onclick="window.annulerCandidature(${item.id})">Annuler dossier</button>`}
+          `}
         </td>
       </tr>
     `;
@@ -285,6 +300,26 @@ window.changerStatutCandidature = async function(id, nouveauStatut) {
     afficherCandidatures(candidaturesCache);
   } catch (err) {
     showToast(`Erreur changement de statut: ${err.message}`, 'error');
+  }
+};
+
+window.annulerCandidature = async function(id) {
+  if (!confirm('Êtes-vous sûr de vouloir annuler cette candidature ?')) return;
+  try {
+    const serviceInfo = CONFIG.services.candidatures;
+    await restCall(
+      `${serviceInfo.endpoint}/${id}`,
+      { method: 'DELETE' },
+      () => {
+        candidaturesCache = candidaturesCache.filter(c => c.id != id);
+        return { success: true };
+      }
+    );
+    candidaturesCache = candidaturesCache.filter(c => c.id != id);
+    showToast('Candidature annulée avec succès.', 'success');
+    afficherCandidatures(candidaturesCache);
+  } catch (err) {
+    showToast(`Erreur annulation: ${err.message}`, 'error');
   }
 };
 

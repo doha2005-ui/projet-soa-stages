@@ -11,19 +11,26 @@ import { showToast } from '../../shared/api.js';
 let offresCache = [];
 
 export async function render(container) {
+  const currentRole = CONFIG.activeRole;
+  const canPublishOffre = currentRole === 'all' || currentRole === 'entreprise';
+
+  const roleMetaHtml = currentRole === 'all'
+    ? `<span class="member-chip">Membre 3</span>
+       <span class="badge-type badge-soap">SOAP JAX-WS</span>
+       <span class="text-muted" style="font-size: 0.8rem;">Service 3: <code>${CONFIG.services.offres.endpoint}</code></span>`
+    : `<span class="member-chip" style="background: #e0f2fe; color: #0369a1;">Vue : ${currentRole === 'etudiant' ? 'Espace Étudiant (Consultation & Postulation)' : currentRole === 'entreprise' ? 'Espace Entreprise (Publication & Gestion)' : 'Espace Responsable (Supervision)'}</span>`;
+
   container.innerHTML = `
     <div class="page-header">
       <div>
         <h2 class="page-title">Offres de Stages</h2>
         <p class="page-subtitle">Catalogue des stages PFE et d'application proposés par nos partenaires</p>
         <div class="page-meta">
-          <span class="member-chip">Membre 3</span>
-          <span class="badge-type badge-soap">SOAP JAX-WS</span>
-          <span class="text-muted" style="font-size: 0.8rem;">Service 3: <code>${CONFIG.services.offres.endpoint}</code></span>
+          ${roleMetaHtml}
         </div>
       </div>
       <div>
-        <button class="btn btn-primary" id="btn-nouvelle-offre">+ Déposer une Offre</button>
+        ${canPublishOffre ? `<button class="btn btn-primary" id="btn-nouvelle-offre">+ Déposer une Offre</button>` : ''}
       </div>
     </div>
 
@@ -104,9 +111,10 @@ export async function render(container) {
   await chargerOffres();
 
   // Événements
-  document.getElementById('offre-search').addEventListener('input', appliquerFiltres);
-  document.getElementById('offre-type-filter').addEventListener('change', appliquerFiltres);
-  document.getElementById('btn-nouvelle-offre').addEventListener('click', () => ouvrirModal());
+  const btnNouvelle = document.getElementById('btn-nouvelle-offre');
+  if (btnNouvelle) {
+    btnNouvelle.addEventListener('click', () => ouvrirModal());
+  }
   document.getElementById('offre-close-btn').addEventListener('click', fermerModal);
   document.getElementById('offre-cancel-btn').addEventListener('click', fermerModal);
 
@@ -197,10 +205,11 @@ function afficherOffres(liste) {
         </div>
       </div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
-        <button class="btn btn-outline btn-sm" onclick="window.editerOffre(${offre.id})">Modifier</button>
+        ${(CONFIG.activeRole === 'all' || CONFIG.activeRole === 'entreprise') ? `<button class="btn btn-outline btn-sm" onclick="window.editerOffre(${offre.id})">Modifier</button>` : '<span></span>'}
+        ${(CONFIG.activeRole === 'all' || CONFIG.activeRole === 'etudiant') ? `
         <a href="#candidatures" class="btn btn-primary btn-sm" onclick="window.postulerAOffre(${offre.id}, '${escapeHtml(offre.titre)}')">
           Postuler à cette offre →
-        </a>
+        </a>` : `<span style="font-size: 0.8rem; color: var(--text-muted);">Consultation</span>`}
       </div>
     </div>
   `).join('');
