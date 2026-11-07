@@ -12,6 +12,9 @@ import javax.jws.soap.SOAPBinding;
 public interface IOffreService {
 
     @WebMethod
+    String ping();
+
+    @WebMethod
     List<Offre> listerOffres();
 
     @WebMethod

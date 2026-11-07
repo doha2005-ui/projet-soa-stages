@@ -16,6 +16,12 @@ public class OffreServiceImpl implements IOffreService {
     private final OffreDAO dao = new OffreDAO();
 
     @Override
+    public String ping() {
+        System.out.println("[SOAP OffreService] Ping reçu");
+        return "Service 3 Offres SOAP OK";
+    }
+
+    @Override
     public List<Offre> listerOffres() {
         System.out.println("[SOAP OffreService] Appel de listerOffres");
         return dao.listerToutes();
