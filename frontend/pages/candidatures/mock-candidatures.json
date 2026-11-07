@@ -9,7 +9,7 @@
     "etudiantEmail": "yassine.benali@inpt.ac.ma",
     "dateDepot": "2026-11-02",
     "statut": "acceptée",
-    "motivation": "Passionné d'architectures distribuées et des technologies Docker/K8s.",
+    "motivation": "Élève-ingénieur en 3ème année à l'INPT (Filière ASE), passionné par les systèmes distribués. Mon projet académique sur Docker, Kubernetes et Apache Kafka m'a permis d'acquérir une solide base pratique pour m'intégrer immédiatement à vos équipes techniques.",
     "orchestrateur": "REST (Service 4 direct)"
   },
   {
@@ -22,21 +22,46 @@
     "etudiantEmail": "fatima.elidrissi@inpt.ac.ma",
     "dateDepot": "2026-11-04",
     "statut": "en cours d'évaluation",
-    "motivation": "Expérience préalable en pentest web et projet académique SOC.",
+    "motivation": "Titulaire de certifications junior en analyse de vulnérabilités et passionnée par la cybersécurité offensive et défensive. Je souhaite vivement contribuer à la mise en place de vos pipelines DevSecOps et audits d'infrastructures.",
     "orchestrateur": "BPMN (Bonita Process)"
   },
   {
     "id": 303,
     "offreId": 203,
-    "offreTitre": "Stage d'Application - Développement Frontend Angular/React",
+    "offreTitre": "Stage Technique - Développement Fullstack Angular & Spring",
     "entrepriseNom": "Fintech Horizons",
     "etudiantId": 3,
     "etudiantNom": "Amrani Mehdi",
     "etudiantEmail": "mehdi.amrani@inpt.ac.ma",
     "dateDepot": "2026-11-05",
     "statut": "déposée",
-    "motivation": "Très motivé pour contribuer à vos interfaces web fintech.",
+    "motivation": "Étudiant en 2ème année filière Génie Logiciel, j'ai développé plusieurs applications web en React/Angular et Spring Boot. Je suis très motivé pour rejoindre l'équipe de Fintech Horizons et contribuer à la refonte du portail bancaire.",
+    "orchestrateur": "REST (Service 4 direct)"
+  },
+  {
+    "id": 304,
+    "offreId": 204,
+    "offreTitre": "Stage PFE - IA Générative & Modèles NLP pour la Relation Client",
+    "entrepriseNom": "DataLab Morocco",
+    "etudiantId": 4,
+    "etudiantNom": "Chraibi Salma",
+    "etudiantEmail": "salma.chraibi@inpt.ac.ma",
+    "dateDepot": "2026-11-06",
+    "statut": "en cours d'évaluation",
+    "motivation": "Spécialisée en Data Science & IA à l'INPT, j'ai réalisé des travaux de recherche sur les LLMs et le Fine-Tuning de modèles open-source. Ce sujet de stage RAG correspond exactement à mon projet de fin d'études.",
     "orchestrateur": "BPMN (Bonita Process)"
+  },
+  {
+    "id": 305,
+    "offreId": 201,
+    "offreTitre": "Stage PFE - Architectures Microservices & DevOps",
+    "entrepriseNom": "TechSolutions Maroc",
+    "etudiantId": 5,
+    "etudiantNom": "Tazi Othmane",
+    "etudiantEmail": "othmane.tazi@inpt.ac.ma",
+    "dateDepot": "2026-11-06",
+    "statut": "refusée",
+    "motivation": "Candidature pour le projet microservices. Compétences en administration de serveurs Linux et scripting Bash.",
+    "orchestrateur": "REST (Service 4 direct)"
   }
 ]
-
