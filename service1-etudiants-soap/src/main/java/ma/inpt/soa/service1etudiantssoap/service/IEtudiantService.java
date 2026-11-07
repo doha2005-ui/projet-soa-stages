@@ -5,10 +5,14 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
+import java.util.List; // <-- AJOUTER CET IMPORT
 
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL)
 public interface IEtudiantService {
+
+    @WebMethod
+    List<Etudiant> listerEtudiants() throws Exception; // <-- AJOUTER CETTE MÉTHODE
 
     @WebMethod
     Etudiant ajouterEtudiant(@WebParam(name = "etudiant") Etudiant etudiant) throws Exception;
