@@ -2,14 +2,12 @@ package ma.inpt.soa.service2entreprisessoap.soap;
 
 import ma.inpt.soa.service2entreprisessoap.dao.EntrepriseDAO;
 import ma.inpt.soa.service2entreprisessoap.entity.Entreprise;
+
+import java.util.List;
+
 import javax.jws.WebService;
 
-@WebService(
-    endpointInterface = "ma.inpt.soa.service2entreprisessoap.soap.EntrepriseService",
-    targetNamespace = "http://soap.soa.inpt.ma/",
-    serviceName = "EntrepriseService",
-    portName = "EntreprisePort"
-)
+@WebService(endpointInterface = "ma.inpt.soa.service2entreprisessoap.soap.EntrepriseService", targetNamespace = "http://soap.soa.inpt.ma/", serviceName = "EntrepriseService", portName = "EntreprisePort")
 public class EntrepriseServiceImpl implements EntrepriseService {
 
     private final EntrepriseDAO dao = new EntrepriseDAO();
@@ -30,5 +28,11 @@ public class EntrepriseServiceImpl implements EntrepriseService {
     public boolean verifierEntrepriseReferencee(int id) {
         System.out.println("SOAP: Vérification de l'entreprise ID : " + id);
         return dao.verifierEntrepriseReferencee(id);
+    }
+
+    @Override
+    public List<Entreprise> listerEntreprises() {
+        
+        return dao.listerToutes();
     }
 }
