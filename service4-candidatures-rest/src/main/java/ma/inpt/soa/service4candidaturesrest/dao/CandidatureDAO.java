@@ -175,6 +175,13 @@ public class CandidatureDAO {
     }
 
     public Candidature creer(Candidature c) {
+        int eId = c.getEtudiantId() > 0 ? c.getEtudiantId() : 1;
+        int oId = c.getOffreId() > 0 ? c.getOffreId() : 1;
+        for (Candidature exist : MEMORY_STORE) {
+            if (exist.getEtudiantId() == eId && exist.getOffreId() == oId) {
+                throw new IllegalStateException("Doublon: l'etudiant #" + eId + " a deja postule a l'offre #" + oId + ".");
+            }
+        }
         if (c.getDateDepot() == null || c.getDateDepot().trim().isEmpty()) {
             c.setDateDepot(LocalDate.now().toString());
         }
