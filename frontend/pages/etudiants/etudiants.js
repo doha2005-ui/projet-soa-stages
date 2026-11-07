@@ -1,9 +1,3 @@
-/**
- * frontend/pages/etudiants/etudiants.js
- * Membre 1 : Service 1 Étudiants (SOAP JAX-WS)
- * Pages : étudiants (fiche, liste, modification)
- */
-
 import { CONFIG } from '../../shared/config.js';
 import { soapCall, getXmlNodeText } from '../../shared/soap.js';
 import { showToast } from '../../shared/api.js';
@@ -27,7 +21,6 @@ export async function render(container) {
       </div>
     </div>
 
-    <!-- Barre d'outils / Recherche -->
     <div class="card" style="margin-bottom: 1.5rem; padding: 1rem;">
       <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
         <input type="text" id="etudiant-search" class="form-input" placeholder="Rechercher par nom, prénom ou CNE..." style="max-width: 320px;">
@@ -35,7 +28,6 @@ export async function render(container) {
       </div>
     </div>
 
-    <!-- Tableau de la liste des étudiants -->
     <div class="table-container">
       <table class="table">
         <thead>
@@ -54,7 +46,6 @@ export async function render(container) {
       </table>
     </div>
 
-    <!-- Modal Fiche / Modification Étudiant -->
     <div id="etudiant-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
@@ -106,10 +97,8 @@ export async function render(container) {
     </div>
   `;
 
-  // Chargement des données SOAP
   await chargerEtudiants();
 
-  // Événements
   document.getElementById('etudiant-search').addEventListener('input', (e) => {
     filtrerEtudiants(e.target.value);
   });
@@ -130,8 +119,6 @@ export async function render(container) {
 async function chargerEtudiants() {
   try {
     const serviceInfo = CONFIG.services.etudiants;
-
-    // Appel SOAP via la bibliothèque commune partagée (Membre 4)
     const result = await soapCall({
       url: serviceInfo.endpoint,
       operation: 'listerEtudiants',
@@ -142,7 +129,6 @@ async function chargerEtudiants() {
     if (Array.isArray(result)) {
       etudiantsCache = result;
     } else if (result?.xmlDoc) {
-      // Parser le XML SOAP si retour réel JAX-WS
       const nodes = result.xmlDoc.querySelectorAll('return, etudiant');
       etudiantsCache = Array.from(nodes).map(node => ({
         id: getXmlNodeText(node, 'id'),
@@ -155,7 +141,6 @@ async function chargerEtudiants() {
         telephone: getXmlNodeText(node, 'telephone')
       }));
     }
-
     afficherTableau(etudiantsCache);
   } catch (err) {
     showToast(`Erreur chargement étudiants: ${err.message}`, 'error');
@@ -221,7 +206,6 @@ function ouvrirModal(etudiant = null) {
     document.getElementById('etudiant-form').reset();
     document.getElementById('form-id').value = '';
   }
-
   modal.style.display = 'flex';
 }
 
@@ -281,9 +265,7 @@ async function sauvegarderEtudiant() {
   }
 }
 
-// Exposé globalement pour les boutons onclick
 window.editerEtudiant = function(id) {
   const etudiant = etudiantsCache.find(e => e.id == id);
   if (etudiant) ouvrirModal(etudiant);
 };
-
