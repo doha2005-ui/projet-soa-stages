@@ -139,30 +139,65 @@ public class OffreDAO {
     }
 
     public boolean verifierDisponibilite(int offreId) {
-        String sql = "SELECT active FROM offres WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, offreId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBoolean("active");
-                }
-            }
-        } catch (SQLException ex) {
-            System.err.println("[OffreDAO] Erreur SQL verifierDisponibilite: " + ex.getMessage());
+        Offre o = getById(offreId);
+        if (o == null || !o.isActive()) {
+            return false;
         }
-        return false;
+        // Vérification du nombre de places disponibles
+        if (o.getPlacesDisponibles() <= 0) {
+            System.out.println("[OffreDAO] Aucune place disponible pour l'offre #" + offreId);
+            return false;
+        }
+        // Contrôle de la date limite de candidature (BPMN Étape 4)
+        if (o.getDateLimite() != null && !o.getDateLimite().trim().isEmpty()) {
+            try {
+                LocalDate limite = LocalDate.parse(o.getDateLimite());
+                if (LocalDate.now().isAfter(limite)) {
+                    System.out.println("[OffreDAO] Date limite de candidature dépassée pour l'offre #" + offreId);
+                    return false;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return true;
     }
 
     public boolean reserverPlace(int offreId) {
-        // Vérifie la disponibilité
         if (!verifierDisponibilite(offreId)) {
             return false;
         }
-        // Enregistre la réservation (l'offre reste consultable ou peut être fermée si quota atteint)
-        System.out.println("[OffreDAO] Place réservée pour l'offre ID : " + offreId);
-        return true;
+        Offre o = getById(offreId);
+        if (o != null) {
+            int nouvellesPlaces = Math.max(0, o.getPlacesDisponibles() - 1);
+            o.setPlacesDisponibles(nouvellesPlaces);
+            if (nouvellesPlaces == 0) {
+                o.setActive(false);
+            }
+            try {
+                String sql = "UPDATE offres SET places_disponibles = ?, active = ? WHERE id = ?";
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, nouvellesPlaces);
+                    ps.setBoolean(2, o.isActive());
+                    ps.setInt(3, offreId);
+                    ps.executeUpdate();
+                }
+            } catch (SQLException e) {
+                try {
+                    String sqlFallback = "UPDATE offres SET active = ? WHERE id = ?";
+                    try (Connection conn = DatabaseConnection.getConnection();
+                         PreparedStatement ps = conn.prepareStatement(sqlFallback)) {
+                        ps.setBoolean(1, o.isActive());
+                        ps.setInt(2, offreId);
+                        ps.executeUpdate();
+                    }
+                } catch (SQLException ignored) {
+                }
+            }
+            System.out.println("[OffreDAO] Place réservée pour l'offre ID : " + offreId + " (Places restantes : " + nouvellesPlaces + ")");
+            return true;
+        }
+        return false;
     }
 
     public boolean verifierCompatibilite(int offreId, int etudiantId) {
@@ -170,8 +205,8 @@ public class OffreDAO {
         if (offre == null || !offre.isActive()) {
             return false;
         }
-        // Règle de gestion : L'offre est valide et disponible
-        return true;
+        // Règle de compatibilité académique : l'offre est active et disponible
+        return verifierDisponibilite(offreId);
     }
 
     private int resoudreEntrepriseId(String raisonSociale) {
@@ -207,6 +242,29 @@ public class OffreDAO {
         o.setDatePublication(datePub != null ? datePub.toString() : "");
         o.setActive(rs.getBoolean("active"));
         o.setEntrepriseNom(rs.getString("entreprise_nom"));
+
+        try {
+            Date dateLim = rs.getDate("date_limite");
+            if (dateLim != null) {
+                o.setDateLimite(dateLim.toString());
+            } else if (datePub != null) {
+                o.setDateLimite(datePub.toLocalDate().plusDays(60).toString());
+            }
+        } catch (SQLException ignored) {
+            if (datePub != null) {
+                o.setDateLimite(datePub.toLocalDate().plusDays(60).toString());
+            }
+        }
+
+        try {
+            int places = rs.getInt("places_disponibles");
+            if (!rs.wasNull()) {
+                o.setPlacesDisponibles(places);
+            }
+        } catch (SQLException ignored) {
+            o.setPlacesDisponibles(1);
+        }
+
         return o;
     }
 }

@@ -199,7 +199,45 @@ public class CandidatureDAO {
         }
     }
 
-    public boolean supprimerCandidature(int id) {
+    public List<Candidature> listerParEtudiant(int etudiantId) {
+        List<Candidature> liste = new ArrayList<>();
+        String sql = "SELECT c.id, c.offre_id, c.etudiant_id, c.date_depot, c.statut, c.motivation, c.orchestrateur, "
+                   + "       COALESCE(o.titre, 'Offre de stage') AS offre_titre, "
+                   + "       COALESCE(e.raison_sociale, 'Entreprise Partenaire') AS entreprise_nom, "
+                   + "       COALESCE(CONCAT(et.prenom, ' ', et.nom), 'Étudiant INPT') AS etudiant_nom, "
+                   + "       COALESCE(et.email, 'etudiant@inpt.ac.ma') AS etudiant_email "
+                   + "FROM candidatures c "
+                   + "LEFT JOIN offres o ON c.offre_id = o.id "
+                   + "LEFT JOIN entreprises e ON o.entreprise_id = e.id "
+                   + "LEFT JOIN etudiants et ON c.etudiant_id = et.id "
+                   + "WHERE c.etudiant_id = ? "
+                   + "ORDER BY c.id DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, etudiantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    liste.add(extraireCandidature(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("[CandidatureDAO] Erreur SQL listerParEtudiant: " + ex.getMessage());
+        }
+        return liste;
+    }
+
+    public boolean supprimerCandidature(int id) throws IllegalStateException {
+        Candidature existante = getById(id);
+        if (existante == null) {
+            return false;
+        }
+        // Règle de gestion AMOA : on ne peut pas annuler une candidature déjà acceptée
+        if ("acceptée".equalsIgnoreCase(existante.getStatut())) {
+            throw new IllegalStateException("Règle de gestion : Impossible d'annuler une candidature déjà acceptée par l'entreprise.");
+        }
+
         String sql = "DELETE FROM candidatures WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

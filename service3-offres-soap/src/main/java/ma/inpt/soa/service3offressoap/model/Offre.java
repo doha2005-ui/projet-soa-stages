@@ -21,6 +21,8 @@ public class Offre implements Serializable {
     private String competences;
     private String description;
     private String datePublication;
+    private String dateLimite;
+    private int placesDisponibles = 1;
     private boolean active = true;
 
     public Offre() {
@@ -129,6 +131,22 @@ public class Offre implements Serializable {
 
     public void setDatePublication(String datePublication) {
         this.datePublication = datePublication;
+    }
+
+    public String getDateLimite() {
+        return dateLimite;
+    }
+
+    public void setDateLimite(String dateLimite) {
+        this.dateLimite = dateLimite;
+    }
+
+    public int getPlacesDisponibles() {
+        return placesDisponibles;
+    }
+
+    public void setPlacesDisponibles(int placesDisponibles) {
+        this.placesDisponibles = placesDisponibles;
     }
 
     public boolean isActive() {

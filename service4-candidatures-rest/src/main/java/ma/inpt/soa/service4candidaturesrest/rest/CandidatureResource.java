@@ -18,14 +18,24 @@ public class CandidatureResource {
     private final CandidatureDAO dao = new CandidatureDAO();
 
     @GET
-    public Response listerCandidatures(@QueryParam("statut") String statut) {
-        System.out.println("[REST Service 4] GET /candidatures (statut=" + statut + ")");
+    public Response listerCandidatures(@QueryParam("statut") String statut, @QueryParam("etudiantId") Integer etudiantId) {
+        System.out.println("[REST Service 4] GET /candidatures (statut=" + statut + ", etudiantId=" + etudiantId + ")");
         List<Candidature> liste;
-        if (statut != null && !statut.trim().isEmpty() && !statut.equalsIgnoreCase("ALL")) {
+        if (etudiantId != null && etudiantId > 0) {
+            liste = dao.listerParEtudiant(etudiantId);
+        } else if (statut != null && !statut.trim().isEmpty() && !statut.equalsIgnoreCase("ALL")) {
             liste = dao.listerParStatut(statut);
         } else {
             liste = dao.listerToutes();
         }
+        return Response.ok(liste).build();
+    }
+
+    @GET
+    @Path("/etudiant/{etudiantId}")
+    public Response getCandidaturesParEtudiant(@PathParam("etudiantId") int etudiantId) {
+        System.out.println("[REST Service 4] GET /candidatures/etudiant/" + etudiantId);
+        List<Candidature> liste = dao.listerParEtudiant(etudiantId);
         return Response.ok(liste).build();
     }
 
@@ -129,12 +139,18 @@ public class CandidatureResource {
                     .build();
         }
 
-        boolean ok = dao.supprimerCandidature(id);
-        if (ok) {
-            return Response.noContent().build();
+        try {
+            boolean ok = dao.supprimerCandidature(id);
+            if (ok) {
+                return Response.noContent().build();
+            }
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiError(500, "Échec de la suppression de la candidature."))
+                    .build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(new ApiError(409, e.getMessage()))
+                    .build();
         }
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ApiError(500, "Échec de la suppression de la candidature."))
-                .build();
     }
 }
