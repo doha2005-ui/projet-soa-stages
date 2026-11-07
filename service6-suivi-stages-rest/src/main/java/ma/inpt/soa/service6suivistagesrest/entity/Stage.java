@@ -2,6 +2,7 @@ package ma.inpt.soa.service6suivistagesrest.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
+import java.util.List;
 
 public class Stage {
     private int id;
@@ -18,9 +19,18 @@ public class Stage {
     private String tuteurEntreprise;
     private String tuteurAcademique;
     private String etat;
+    
+    // Champs enrichis pour le frontend
+    private String etudiantNom;
+    private String etudiantPrenom;
+    private String etudiantCne;
+    private String entrepriseNom;
+    private List<CompteRendu> comptesRendus;
+    private Evaluation evaluation;
 
     public Stage() {}
 
+    // Getters et Setters existants
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -47,4 +57,23 @@ public class Stage {
 
     public String getEtat() { return etat; }
     public void setEtat(String etat) { this.etat = etat; }
+
+    // Nouveaux getters et setters
+    public String getEtudiantNom() { return etudiantNom; }
+    public void setEtudiantNom(String etudiantNom) { this.etudiantNom = etudiantNom; }
+
+    public String getEtudiantPrenom() { return etudiantPrenom; }
+    public void setEtudiantPrenom(String etudiantPrenom) { this.etudiantPrenom = etudiantPrenom; }
+
+    public String getEtudiantCne() { return etudiantCne; }
+    public void setEtudiantCne(String etudiantCne) { this.etudiantCne = etudiantCne; }
+
+    public String getEntrepriseNom() { return entrepriseNom; }
+    public void setEntrepriseNom(String entrepriseNom) { this.entrepriseNom = entrepriseNom; }
+
+    public List<CompteRendu> getComptesRendus() { return comptesRendus; }
+    public void setComptesRendus(List<CompteRendu> comptesRendus) { this.comptesRendus = comptesRendus; }
+
+    public Evaluation getEvaluation() { return evaluation; }
+    public void setEvaluation(Evaluation evaluation) { this.evaluation = evaluation; }
 }
