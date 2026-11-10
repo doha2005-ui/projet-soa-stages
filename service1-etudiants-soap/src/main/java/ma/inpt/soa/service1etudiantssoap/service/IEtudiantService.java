@@ -7,7 +7,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import java.util.List;
 
-@WebService
+@WebService(targetNamespace = "http://service1.soa.inpt.ma/")
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL)
 public interface IEtudiantService {
 

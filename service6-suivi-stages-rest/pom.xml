@@ -15,7 +15,6 @@
   <name>service6-suivi-stages-rest</name>
 
   <dependencies>
-    <!-- Servlet API fournie par Tomcat 9 -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -23,28 +22,26 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- JAX-RS (REST) avec Jersey, compatible Tomcat 9 -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
-      <version>${jersey.version}</version>
+      <version>2.35</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
-      <version>${jersey.version}</version>
+      <version>2.35</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>${jersey.version}</version>
+      <version>2.35</version>
     </dependency>
 
-    <!-- Pilote de base de données (remplacer par PostgreSQL si besoin) -->
     <dependency>
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
-      <version>${mysql.version}</version>
+      <version>8.0.33</version>
     </dependency>
   </dependencies>
 
@@ -54,7 +51,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.4.0</version>
+        <version>3.3.2</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>

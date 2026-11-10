@@ -5,12 +5,15 @@
  * Centralise les adresses de tous les services SOA pour faciliter l'intégration
  * et éviter de casser les écrans lors d'un changement de port ou d'hôte.
  *
- * Comprend également l'interrupteur 'useMock' pour tester avec les données JSON
- * simulées sans attendre que les web services backend soient déployés.
+ * Le port Tomcat par défaut est 8081 pour éviter le conflit avec PostgreSQL EDB (port 8080).
  */
 
 const STORAGE_KEY_MOCK = 'soa_use_mock';
 const STORAGE_KEY_ROLE = 'soa_active_role';
+const STORAGE_KEY_TOMCAT = 'soa_tomcat_base_url';
+
+// URL de base de Tomcat (port 8082 configuré sur votre machine)
+const TOMCAT_BASE = localStorage.getItem(STORAGE_KEY_TOMCAT) || 'http://localhost:8082';
 
 export const CONFIG = {
   // Mode mock activé par défaut pour permettre un démarrage immédiat
@@ -21,8 +24,8 @@ export const CONFIG = {
   // Rôle actif pour le filtrage des menus ('all', 'etudiant', 'entreprise', 'responsable')
   activeRole: localStorage.getItem(STORAGE_KEY_ROLE) || 'all',
 
-  // Hôte Tomcat par défaut (si déployé dans le même Tomcat ou externe)
-  tomcatBaseUrl: 'http://localhost:8080',
+  // Hôte Tomcat
+  tomcatBaseUrl: TOMCAT_BASE,
 
   // Configuration de chaque service du projet
   services: {
@@ -33,13 +36,15 @@ export const CONFIG = {
       member: 'Membre 1',
       endpoint: 'http://localhost:8080/service1-etudiants-soap/etudiants',
       namespace: 'http://service.service1etudiantssoap.soa.inpt.ma/',
+      endpoint: `${TOMCAT_BASE}/service1-etudiants-soap/etudiants`,
+      namespace: 'http://service1.soa.inpt.ma/',
       mockFile: 'pages/etudiants/mock-etudiants.json'
     },
     notifications: {
       name: 'Service 5 : Notifications',
       type: 'REST',
       member: 'Membre 1',
-      endpoint: 'http://localhost:8080/service5-notifications-rest/api/notifications',
+      endpoint: `${TOMCAT_BASE}/service5-notifications-rest/api/notifications`,
       mockFile: 'pages/notifications/mock-notifications.json'
     },
 
@@ -48,15 +53,15 @@ export const CONFIG = {
       name: 'Service 2 : Entreprises',
       type: 'SOAP',
       member: 'Membre 2',
-      endpoint: 'http://localhost:8080/service2-entreprises-soap/EntrepriseService',
-      namespace: 'http://service2.soa.inpt.ma/',
+      endpoint: `${TOMCAT_BASE}/service2-entreprises-soap/services/entreprise`,
+      namespace: 'http://soap.soa.inpt.ma/',
       mockFile: 'pages/entreprises/mock-entreprises.json'
     },
     stages: {
       name: 'Service 6 : Suivi des Stages',
       type: 'REST',
       member: 'Membre 2',
-      endpoint: 'http://localhost:8080/service6-suivi-stages-rest/api/stages',
+      endpoint: `${TOMCAT_BASE}/service6-suivi-stages-rest/api/stages`,
       mockFile: 'pages/stages/mock-stages.json'
     },
 
@@ -65,7 +70,7 @@ export const CONFIG = {
       name: 'Service 3 : Offres',
       type: 'SOAP',
       member: 'Membre 3',
-      endpoint: 'http://localhost:8080/service3-offres-soap/OffreService',
+      endpoint: `${TOMCAT_BASE}/service3-offres-soap/OffreService`,
       namespace: 'http://service3.soa.inpt.ma/',
       mockFile: 'pages/offres/mock-offres.json'
     },
@@ -73,7 +78,7 @@ export const CONFIG = {
       name: 'Service 4 : Candidatures',
       type: 'REST',
       member: 'Membre 3',
-      endpoint: 'http://localhost:8080/service4-candidatures-rest/api/candidatures',
+      endpoint: `${TOMCAT_BASE}/service4-candidatures-rest/api/candidatures`,
       mockFile: 'pages/candidatures/mock-candidatures.json'
     },
 
@@ -82,7 +87,7 @@ export const CONFIG = {
       name: 'Orchestrateur : Processus BPMN (Bonita)',
       type: 'REST',
       member: 'Membre 4',
-      endpoint: 'http://localhost:8080/bonita/API/bpm',
+      endpoint: `${TOMCAT_BASE}/bonita/API/bpm`,
       mockFile: 'pages/bpmn/mock-bpmn.json'
     }
   },
@@ -101,6 +106,13 @@ export const CONFIG = {
   setActiveRole(role) {
     this.activeRole = role;
     localStorage.setItem(STORAGE_KEY_ROLE, role);
+  },
+
+  /**
+   * Permet de changer dynamiquement l'URL de base de Tomcat
+   */
+  setTomcatBaseUrl(url) {
+    this.tomcatBaseUrl = url;
+    localStorage.setItem(STORAGE_KEY_TOMCAT, url);
   }
 };
-
