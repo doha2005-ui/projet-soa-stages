@@ -31,8 +31,8 @@ export const CONFIG = {
       name: 'Service 1 : Étudiants',
       type: 'SOAP',
       member: 'Membre 1',
-      endpoint: 'http://localhost:8080/service1-etudiants-soap/EtudiantService',
-      namespace: 'http://service1.soa.inpt.ma/',
+      endpoint: 'http://localhost:8080/service1-etudiants-soap/etudiants',
+      namespace: 'http://service.service1etudiantssoap.soa.inpt.ma/',
       mockFile: 'pages/etudiants/mock-etudiants.json'
     },
     notifications: {
