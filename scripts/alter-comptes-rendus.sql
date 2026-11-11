@@ -1,0 +1,6 @@
+USE soa_stages;
+ALTER TABLE comptes_rendus 
+  ADD COLUMN IF NOT EXISTS fichier_nom VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS fichier_data LONGTEXT DEFAULT NULL;
+DESCRIBE comptes_rendus;
+

@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS comptes_rendus (
     periode VARCHAR(100) NOT NULL,
     date_depot DATE NOT NULL,
     resume TEXT NOT NULL,
+    fichier_nom VARCHAR(255) DEFAULT NULL,
+    fichier_data LONGTEXT DEFAULT NULL,
     statut_validation ENUM('EN_ATTENTE', 'VALIDÉ', 'À_REVOIR') DEFAULT 'EN_ATTENTE',
     FOREIGN KEY (stage_id) REFERENCES stages(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

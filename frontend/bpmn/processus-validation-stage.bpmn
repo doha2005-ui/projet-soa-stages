@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_1"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <!-- Collaboration : 3 Couloirs (Lanes) -->
+  <bpmn:collaboration id="Collaboration_Processus_Stages">
+    <bpmn:participant id="Participant_Gestion_Stages" name="Processus de Validation et Conventionnement de Stage" processRef="Process_Gestion_Stages" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_Gestion_Stages" isExecutable="true">
+    
+    <!-- Couloirs (Lanes) -->
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Entreprise" name="Entreprise Partenaire">
+        <bpmn:flowNodeRef>Start_Candidature_Retenue</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+      <bpmn:lane id="Lane_Responsable" name="Responsable des Stages (INPT)">
+        <bpmn:flowNodeRef>Task_Check_Etudiant_SOAP</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Check_Entreprise_SOAP</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Validation_Pedagogique</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Sujet_Valide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notifier_Refus_REST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Rejete</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Generer_Convention</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Creer_Stage_REST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notifier_Succes_REST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Accepte</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Etudiant" name="Étudiant Candidat">
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Événement de Début -->
+    <bpmn:startEvent id="Start_Candidature_Retenue" name="Candidature Sélectionnée par l'Entreprise">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tâche 1 : SOAP Service 1 (Vérifier Étudiant) -->
+    <bpmn:serviceTask id="Task_Check_Etudiant_SOAP" name="Vérifier Éligibilité Étudiant (SOAP S1 : verifierStatut)">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Tâche 2 : SOAP Service 2 (Vérifier Entreprise) -->
+    <bpmn:serviceTask id="Task_Check_Entreprise_SOAP" name="Vérifier Convention Entreprise (SOAP S2 : verifierEntrepriseReferencee)">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Tâche 3 : Humaine (Validation Pédagogique) -->
+    <bpmn:userTask id="Task_Validation_Pedagogique" name="Validation Pédagogique du Sujet de Stage (Responsable INPT)">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Passerelle Exclusive (Choix Sujet Validé ?) -->
+    <bpmn:exclusiveGateway id="Gateway_Sujet_Valide" name="Sujet Validé ?" default="Flow_Valide">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_Valide</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejete</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Branche Refus -->
+    <bpmn:serviceTask id="Task_Notifier_Refus_REST" name="Notifier Refus du Sujet (REST S5 : /api/notifications)">
+      <bpmn:incoming>Flow_Rejete</bpmn:incoming>
+      <bpmn:outgoing>Flow_End_Refus</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_Rejete" name="Stage Refusé">
+      <bpmn:incoming>Flow_End_Refus</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Branche Accord -->
+    <bpmn:businessRuleTask id="Task_Generer_Convention" name="Générer Convention Tripartite (Bonita Document)">
+      <bpmn:incoming>Flow_Valide</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+
+    <!-- Tâche 4 : REST Service 6 (Créer Stage) -->
+    <bpmn:serviceTask id="Task_Creer_Stage_REST" name="Créer Dossier Stage Actif (REST S6 : POST /api/stages)">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Tâche 5 : REST Service 5 (Notifier Succès) -->
+    <bpmn:serviceTask id="Task_Notifier_Succes_REST" name="Notifier Étudiant &amp; Entreprise (REST S5 : /api/notifications)">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_End_Succes</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_Accepte" name="Stage Validé &amp; Conventionné">
+      <bpmn:incoming>Flow_End_Succes</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Transitions -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_Candidature_Retenue" targetRef="Task_Check_Etudiant_SOAP" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Check_Etudiant_SOAP" targetRef="Task_Check_Entreprise_SOAP" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_Check_Entreprise_SOAP" targetRef="Task_Validation_Pedagogique" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_Validation_Pedagogique" targetRef="Gateway_Sujet_Valide" />
+    <bpmn:sequenceFlow id="Flow_Valide" name="Oui (Conforme)" sourceRef="Gateway_Sujet_Valide" targetRef="Task_Generer_Convention" />
+    <bpmn:sequenceFlow id="Flow_Rejete" name="Non (Non conforme)" sourceRef="Gateway_Sujet_Valide" targetRef="Task_Notifier_Refus_REST" />
+    <bpmn:sequenceFlow id="Flow_End_Refus" sourceRef="Task_Notifier_Refus_REST" targetRef="End_Rejete" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_Generer_Convention" targetRef="Task_Creer_Stage_REST" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_Creer_Stage_REST" targetRef="Task_Notifier_Succes_REST" />
+    <bpmn:sequenceFlow id="Flow_End_Succes" sourceRef="Task_Notifier_Succes_REST" targetRef="End_Accepte" />
+
+  </bpmn:process>
+
+  <!-- Diagramme Graphique Visuel (Positionnement X, Y automatique) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_Processus_Stages">
+      
+      <bpmndi:BPMNShape id="Participant_di" bpmnElement="Participant_Gestion_Stages" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1380" height="490" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Entreprise_di" bpmnElement="Lane_Entreprise" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1350" height="130" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Responsable_di" bpmnElement="Lane_Responsable" isHorizontal="true">
+        <dc:Bounds x="190" y="210" width="1350" height="240" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Etudiant_di" bpmnElement="Lane_Etudiant" isHorizontal="true">
+        <dc:Bounds x="190" y="450" width="1350" height="120" />
+      </bpmndi:BPMNShape>
+
+      <!-- Éléments Graphiques -->
+      <bpmndi:BPMNShape id="Start_di" bpmnElement="Start_Candidature_Retenue">
+        <dc:Bounds x="240" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SOAP1_di" bpmnElement="Task_Check_Etudiant_SOAP">
+        <dc:Bounds x="320" y="270" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SOAP2_di" bpmnElement="Task_Check_Entreprise_SOAP">
+        <dc:Bounds x="480" y="270" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_User_di" bpmnElement="Task_Validation_Pedagogique">
+        <dc:Bounds x="640" y="270" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_di" bpmnElement="Gateway_Sujet_Valide" isMarkerVisible="true">
+        <dc:Bounds x="800" y="285" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Refus_di" bpmnElement="Task_Notifier_Refus_REST">
+        <dc:Bounds x="890" y="220" width="120" height="70" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Rejete_di" bpmnElement="End_Rejete">
+        <dc:Bounds x="1060" y="237" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Convention_di" bpmnElement="Task_Generer_Convention">
+        <dc:Bounds x="890" y="340" width="120" height="70" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CreerStage_di" bpmnElement="Task_Creer_Stage_REST">
+        <dc:Bounds x="1050" y="340" width="120" height="70" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_NotifSucces_di" bpmnElement="Task_Notifier_Succes_REST">
+        <dc:Bounds x="1210" y="340" width="120" height="70" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Accepte_di" bpmnElement="End_Accepte">
+        <dc:Bounds x="1370" y="357" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Liaisons -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="276" y="140" />
+        <di:waypoint x="298" y="140" />
+        <di:waypoint x="298" y="310" />
+        <di:waypoint x="320" y="310" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="440" y="310" />
+        <di:waypoint x="480" y="310" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="600" y="310" />
+        <di:waypoint x="640" y="310" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="760" y="310" />
+        <di:waypoint x="800" y="310" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Valide_di" bpmnElement="Flow_Valide">
+        <di:waypoint x="825" y="335" />
+        <di:waypoint x="825" y="375" />
+        <di:waypoint x="890" y="375" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Rejete_di" bpmnElement="Flow_Rejete">
+        <di:waypoint x="825" y="285" />
+        <di:waypoint x="825" y="255" />
+        <di:waypoint x="890" y="255" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_End_Refus_di" bpmnElement="Flow_End_Refus">
+        <di:waypoint x="1010" y="255" />
+        <di:waypoint x="1060" y="255" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="1010" y="375" />
+        <di:waypoint x="1050" y="375" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1170" y="375" />
+        <di:waypoint x="1210" y="375" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_End_Succes_di" bpmnElement="Flow_End_Succes">
+        <di:waypoint x="1330" y="375" />
+        <di:waypoint x="1370" y="375" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
+

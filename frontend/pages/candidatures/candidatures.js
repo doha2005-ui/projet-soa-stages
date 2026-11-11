@@ -658,7 +658,6 @@ function fermerDetailModal() {
 async function soumettreCandidature() {
   const route = document.getElementById('cand-form-route').value;
   const nouvelleCand = {
-    id: 300 + candidaturesCache.length + 1,
     offreId: 201,
     offreTitre: document.getElementById('cand-form-offre').value.trim(),
     entrepriseNom: document.getElementById('cand-form-entreprise').value.trim() || 'Entreprise Partenaire',
