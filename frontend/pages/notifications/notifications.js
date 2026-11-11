@@ -157,7 +157,6 @@ function fermerModal() {
 
 async function envoyerNotification() {
   const notif = {
-    id: Date.now(),
     destinataireType: document.getElementById('notif-form-type').value,
     destinataireId: 1,
     titre: document.getElementById('notif-form-titre').value,

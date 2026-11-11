@@ -127,6 +127,8 @@ public class StageDAO {
                 cr.setPeriode(rs.getString("periode"));
                 cr.setDateDepot(rs.getDate("date_depot"));
                 cr.setResume(rs.getString("resume"));
+                cr.setFichierNom(rs.getString("fichier_nom"));
+                cr.setFichierData(rs.getString("fichier_data"));
                 cr.setStatutValidation(rs.getString("statut_validation"));
                 liste.add(cr);
             }
@@ -181,14 +183,16 @@ public class StageDAO {
     }
 
     public boolean ajouterCompteRendu(int stageId, CompteRendu cr) {
-        String sql = "INSERT INTO comptes_rendus (stage_id, periode, date_depot, resume, statut_validation) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO comptes_rendus (stage_id, periode, date_depot, resume, fichier_nom, fichier_data, statut_validation) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, stageId);
             ps.setString(2, cr.getPeriode());
             ps.setDate(3, cr.getDateDepot() != null ? new java.sql.Date(cr.getDateDepot().getTime()) : new java.sql.Date(System.currentTimeMillis()));
             ps.setString(4, cr.getResume());
-            ps.setString(5, cr.getStatutValidation() != null ? cr.getStatutValidation() : "EN_ATTENTE");
+            ps.setString(5, cr.getFichierNom());
+            ps.setString(6, cr.getFichierData());
+            ps.setString(7, cr.getStatutValidation() != null ? cr.getStatutValidation() : "EN_ATTENTE");
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             System.err.println("ERREUR SQL (Ajout Compte Rendu) : " + ex.getMessage());

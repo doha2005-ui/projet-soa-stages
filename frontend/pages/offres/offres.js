@@ -777,8 +777,12 @@ async function sauvegarderOffre() {
 
     showToast(id ? 'Offre mise à jour avec succès via SOAP.' : 'Offre publiée avec succès via SOAP JAX-WS.', 'success');
     fermerModal();
-    mettreAJourKPIs();
-    appliquerFiltres();
+    if (!CONFIG.useMock) {
+      await chargerOffres(); // recharge depuis la base (nouvel id, entreprise réelle)
+    } else {
+      mettreAJourKPIs();
+      appliquerFiltres();
+    }
   } catch (err) {
     showToast(`Erreur lors de l'enregistrement SOAP: ${err.message}`, 'error');
   }

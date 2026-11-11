@@ -46,7 +46,14 @@ export async function render(container) {
           </div>
           <div class="form-group">
             <label class="form-label">Activités réalisées & Résultats</label>
-            <textarea id="cr-resume" class="form-textarea" rows="4" placeholder="Décrivez les livrables, difficultés et avancement..." required></textarea>
+            <textarea id="cr-resume" class="form-textarea" rows="3" placeholder="Décrivez les livrables, difficultés et avancement..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Document du Rapport (PDF)</label>
+            <input type="file" id="cr-file" class="form-input" accept="application/pdf,.pdf" required>
+            <div id="cr-file-info" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Sélectionnez votre fichier rapport au format PDF
+            </div>
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
             <button type="button" class="btn btn-outline" id="cr-cancel-btn">Annuler</button>
@@ -165,6 +172,13 @@ function afficherStages(liste) {
                   </span>
                 </div>
                 <p style="color: var(--text-main); font-size: 0.8rem; margin: 0.25rem 0;">${cr.resume}</p>
+                ${cr.fichierNom ? `
+                  <div style="margin: 0.4rem 0;">
+                    <a href="${cr.fichierData || '#'}" download="${cr.fichierNom}" target="_blank" class="badge" style="background: rgba(37,99,235,0.1); color: #2563eb; border: 1px solid rgba(37,99,235,0.25); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 3px 8px; font-size: 0.75rem;">
+                      📄 Télécharger : <strong>${cr.fichierNom}</strong>
+                    </a>
+                  </div>
+                ` : ''}
                 <div style="font-size: 0.7rem; color: var(--text-light);">Déposé le ${cr.dateDepot}</div>
               </div>
             `).join('')
@@ -208,11 +222,28 @@ window.ouvrirEval = function (stageId) {
 };
 async function soumettreCompteRendu() {
   const stageId = document.getElementById('cr-stage-id').value;
+  const fileInput = document.getElementById('cr-file');
+  let fichierNom = null;
+  let fichierData = null;
+
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    fichierNom = file.name;
+    fichierData = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   const nouveauCR = {
     id: Date.now(),
     periode: document.getElementById('cr-periode').value,
     dateDepot: new Date().toISOString().split('T')[0],
     resume: document.getElementById('cr-resume').value,
+    fichierNom: fichierNom,
+    fichierData: fichierData,
     statutValidation: 'EN_ATTENTE'
   };
 
@@ -231,9 +262,9 @@ async function soumettreCompteRendu() {
       }
     );
 
-    showToast('Compte rendu déposé avec succès !', 'success');
+    showToast('Compte rendu et fichier PDF déposés avec succès !', 'success');
     fermerModal('cr-modal');
-    afficherStages(stagesCache);
+    await chargerStages();
   } catch (err) {
     showToast(`Erreur dépôt CR: ${err.message}`, 'error');
   }

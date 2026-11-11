@@ -1,8 +1,10 @@
 package ma.inpt.soa.service6suivistagesrest.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CompteRendu {
     private int id;
     private int stageId;
@@ -10,6 +12,8 @@ public class CompteRendu {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateDepot;
     private String resume;
+    private String fichierNom;
+    private String fichierData;
     private String statutValidation;
 
     public CompteRendu() {}
@@ -28,6 +32,12 @@ public class CompteRendu {
 
     public String getResume() { return resume; }
     public void setResume(String resume) { this.resume = resume; }
+
+    public String getFichierNom() { return fichierNom; }
+    public void setFichierNom(String fichierNom) { this.fichierNom = fichierNom; }
+
+    public String getFichierData() { return fichierData; }
+    public void setFichierData(String fichierData) { this.fichierData = fichierData; }
 
     public String getStatutValidation() { return statutValidation; }
     public void setStatutValidation(String statutValidation) { this.statutValidation = statutValidation; }

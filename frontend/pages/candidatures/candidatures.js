@@ -658,7 +658,6 @@ function fermerDetailModal() {
 async function soumettreCandidature() {
   const route = document.getElementById('cand-form-route').value;
   const nouvelleCand = {
-    id: 300 + candidaturesCache.length + 1,
     offreId: 201,
     offreTitre: document.getElementById('cand-form-offre').value.trim(),
     entrepriseNom: document.getElementById('cand-form-entreprise').value.trim() || 'Entreprise Partenaire',
@@ -690,8 +689,12 @@ async function soumettreCandidature() {
 
     showToast(`Candidature soumise avec succès via ${route === 'BPMN' ? 'Orchestration BPMN' : 'REST Service 4'}.`, 'success');
     fermerModal();
-    mettreAJourKPIs();
-    appliquerFiltres();
+    if (!CONFIG.useMock) {
+      await chargerCandidatures(); // recharge depuis la base (vrai id, jointures)
+    } else {
+      mettreAJourKPIs();
+      appliquerFiltres();
+    }
   } catch (err) {
     showToast(`Erreur de soumission: ${err.message}`, 'error');
   }
