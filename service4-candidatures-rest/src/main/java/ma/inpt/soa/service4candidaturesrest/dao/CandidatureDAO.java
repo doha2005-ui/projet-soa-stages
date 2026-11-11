@@ -185,6 +185,51 @@ public class CandidatureDAO {
             c.setOrchestrateur("REST (Service 4 direct)");
         }
 
+        // Retrouver l'étudiant et l'offre réels (email / intitulé envoyés par le formulaire, sinon identifiants)
+        try (Connection conn0 = DatabaseConnection.getConnection()) {
+            Integer etuId;
+            String email = c.getEtudiantEmail() != null ? c.getEtudiantEmail().trim() : "";
+            if (!email.isEmpty()) {
+                etuId = trouverId(conn0, "SELECT id FROM etudiants WHERE email = ?", email);
+                if (etuId == null) {
+                    throw new IllegalArgumentException("Aucun étudiant avec l'email « " + email + " » dans la base.");
+                }
+            } else if (c.getEtudiantId() > 0 && existe(conn0, "etudiants", c.getEtudiantId())) {
+                etuId = c.getEtudiantId();
+            } else {
+                throw new IllegalArgumentException("Étudiant introuvable : fournissez un email ou un etudiantId valide.");
+            }
+
+            Integer offId;
+            String titre = c.getOffreTitre() != null ? c.getOffreTitre().trim() : "";
+            if (!titre.isEmpty()) {
+                offId = trouverId(conn0, "SELECT id FROM offres WHERE titre = ?", titre);
+                if (offId == null) {
+                    throw new IllegalArgumentException("Aucune offre avec l'intitulé « " + titre + " » dans la base.");
+                }
+            } else if (c.getOffreId() > 0 && existe(conn0, "offres", c.getOffreId())) {
+                offId = c.getOffreId();
+            } else {
+                throw new IllegalArgumentException("Offre introuvable : fournissez un intitulé ou un offreId valide.");
+            }
+
+            try (PreparedStatement psD = conn0.prepareStatement(
+                    "SELECT COUNT(*) FROM candidatures WHERE offre_id = ? AND etudiant_id = ?")) {
+                psD.setInt(1, offId);
+                psD.setInt(2, etuId);
+                try (ResultSet rsD = psD.executeQuery()) {
+                    if (rsD.next() && rsD.getInt(1) > 0) {
+                        throw new IllegalStateException("Cet étudiant a déjà candidaté à cette offre.");
+                    }
+                }
+            }
+
+            c.setEtudiantId(etuId);
+            c.setOffreId(offId);
+        } catch (SQLException ex) {
+            throw new RuntimeException("Base de données inaccessible : " + ex.getMessage(), ex);
+        }
+
         String sql = "INSERT INTO candidatures (offre_id, etudiant_id, date_depot, statut, motivation, orchestrateur) "
                    + "VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -208,14 +253,29 @@ public class CandidatureDAO {
                 return c;
             }
         } catch (Exception ex) {
-            System.err.println("[CandidatureDAO] Base inaccessible pour creer, bascule mémoire: " + ex.getMessage());
+            throw new RuntimeException("Échec d'enregistrement de la candidature : " + ex.getMessage(), ex);
         }
+        throw new RuntimeException("Aucune ligne insérée pour la candidature.");
+    }
 
-        if (c.getId() <= 0) {
-            c.setId(ID_GEN.incrementAndGet());
+    private Integer trouverId(Connection conn, String sql, String valeur) throws SQLException {
+        if (valeur == null) return null;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, valeur.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : null;
+            }
         }
-        MEMORY_STORE.add(0, c);
-        return c;
+    }
+
+    // 'table' est toujours une constante interne (jamais une saisie utilisateur)
+    private boolean existe(Connection conn, String table, int id) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM " + table + " WHERE id = ?")) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
     public boolean changerStatut(int id, String nouveauStatut) {

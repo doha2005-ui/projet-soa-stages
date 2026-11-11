@@ -690,8 +690,12 @@ async function soumettreCandidature() {
 
     showToast(`Candidature soumise avec succès via ${route === 'BPMN' ? 'Orchestration BPMN' : 'REST Service 4'}.`, 'success');
     fermerModal();
-    mettreAJourKPIs();
-    appliquerFiltres();
+    if (!CONFIG.useMock) {
+      await chargerCandidatures(); // recharge depuis la base (vrai id, jointures)
+    } else {
+      mettreAJourKPIs();
+      appliquerFiltres();
+    }
   } catch (err) {
     showToast(`Erreur de soumission: ${err.message}`, 'error');
   }

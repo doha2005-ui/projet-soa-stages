@@ -125,8 +125,21 @@ public class OffreDAO {
         if (o.getDatePublication() == null || o.getDatePublication().trim().isEmpty()) {
             o.setDatePublication(LocalDate.now().toString());
         }
-        if (o.getEntrepriseNom() == null || o.getEntrepriseNom().trim().isEmpty()) {
-            o.setEntrepriseNom("TechSolutions Maroc");
+        // Retrouver l'entreprise réelle à partir de son nom (le formulaire n'envoie que le nom)
+        try (Connection connE = DatabaseConnection.getConnection()) {
+            String nomEnt = o.getEntrepriseNom() != null ? o.getEntrepriseNom().trim() : "";
+            if (!nomEnt.isEmpty()) {
+                Integer idEnt = trouverId(connE, "SELECT id FROM entreprises WHERE raison_sociale = ?", nomEnt);
+                if (idEnt != null) {
+                    o.setEntrepriseId(idEnt);
+                } else if (o.getEntrepriseId() <= 0) {
+                    throw new IllegalArgumentException("Aucune entreprise nommée « " + nomEnt + " » dans la base.");
+                }
+            } else if (o.getEntrepriseId() <= 0) {
+                throw new IllegalArgumentException("L'entreprise est obligatoire (nom ou identifiant).");
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Base de données inaccessible : " + ex.getMessage(), ex);
         }
 
         String sql = "INSERT INTO offres (entreprise_id, titre, lieu, type, duree, remuneration, competences, description, date_publication, active) "
@@ -156,15 +169,19 @@ public class OffreDAO {
                 return o;
             }
         } catch (Exception ex) {
-            System.err.println("[OffreDAO] Base inaccessible pour ajouterOffre, bascule mémoire: " + ex.getMessage());
+            throw new RuntimeException("Échec d'enregistrement de l'offre : " + ex.getMessage(), ex);
         }
+        throw new RuntimeException("Aucune ligne insérée pour l'offre.");
+    }
 
-        // Fallback en mémoire
-        if (o.getId() <= 0) {
-            o.setId(ID_GEN.incrementAndGet());
+    private Integer trouverId(Connection conn, String sql, String valeur) throws SQLException {
+        if (valeur == null) return null;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, valeur.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : null;
+            }
         }
-        MEMORY_STORE.add(0, o);
-        return o;
     }
 
     public boolean modifierOffre(Offre o) {
